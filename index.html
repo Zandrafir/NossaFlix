@@ -991,11 +991,11 @@ function playTudum() {
 // ── SPOTIFY WIDGET ─────────────────────────
 // Substitua PLAYLIST_ID pelo ID da sua playlist do Spotify
 // Ex: se a URL for open.spotify.com/playlist/37i9dQZF1DX... → o ID é 37i9dQZF1DX...
-var SPOTIFY_PLAYLIST_ID = 'COLOQUE_O_ID_AQUI';
+var SPOTIFY_PLAYLIST_ID = 'https://open.spotify.com/playlist/55gkIrWnr4yTRBKk659LtF?si=rytByE-fRWuy9NiE6mMBSg';
 var spotifyVisible = false;
 
 function createSpotifyWidget() {
-  if (!SPOTIFY_PLAYLIST_ID || SPOTIFY_PLAYLIST_ID === 'COLOQUE_O_ID_AQUI') return;
+  if (!SPOTIFY_PLAYLIST_ID || SPOTIFY_PLAYLIST_ID === 'https://open.spotify.com/playlist/55gkIrWnr4yTRBKk659LtF?si=rytByE-fRWuy9NiE6mMBSg') return;
   var wrap = document.createElement('div');
   wrap.id = 'spotify-widget';
   wrap.style.cssText = [
