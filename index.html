@@ -504,7 +504,7 @@ html,body{width:100%;height:100%;background:var(--bg);color:var(--text);font-fam
   <button id="spotify-btn" onclick="toggleSpotify()" title="Música">🎵</button>
   <div id="spotify-wrap">
     <iframe id="spotify-frame"
-      src="https://open.spotify.com/playlist/55gkIrWnr4yTRBKk659LtF?si=rytByE-fRWuy9NiE6mMBSg"
+      src="https://open.spotify.com/embed/playlist/55gkIrWnr4yTRBKk659LtF?utm_source=generator&theme=0"
       width="280" height="152" frameBorder="0" allowtransparency="true"
       allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
       loading="lazy" style="border-radius:8px;display:block"></iframe>
@@ -991,11 +991,11 @@ function playTudum() {
 // ── SPOTIFY WIDGET ─────────────────────────
 // Substitua PLAYLIST_ID pelo ID da sua playlist do Spotify
 // Ex: se a URL for open.spotify.com/playlist/37i9dQZF1DX... → o ID é 37i9dQZF1DX...
-var SPOTIFY_PLAYLIST_ID = 'https://open.spotify.com/playlist/55gkIrWnr4yTRBKk659LtF?si=rytByE-fRWuy9NiE6mMBSg';
+var SPOTIFY_PLAYLIST_ID = '55gkIrWnr4yTRBKk659LtF';
 var spotifyVisible = false;
 
 function createSpotifyWidget() {
-  if (!SPOTIFY_PLAYLIST_ID || SPOTIFY_PLAYLIST_ID === 'https://open.spotify.com/playlist/55gkIrWnr4yTRBKk659LtF?si=rytByE-fRWuy9NiE6mMBSg') return;
+  if (!SPOTIFY_PLAYLIST_ID || SPOTIFY_PLAYLIST_ID === 'COLOQUE_O_ID_AQUI') return;
   var wrap = document.createElement('div');
   wrap.id = 'spotify-widget';
   wrap.style.cssText = [
@@ -1159,13 +1159,14 @@ document.addEventListener('keydown', function(e) {
         <h2 class="roteiro-section-title">🏡 Nossa Hospedagem</h2>
         <div class="rcard rcard-verde" style="max-width:700px">
           <div class="rcard-body">
-            <div class="rcard-tag">CHALÉ COM HIDRO</div>
+            <div class="rcard-tag">CHALÉ COM PISCINA E HIDRO</div>
             <div class="rcard-title">Airbnb · Campos do Jordão</div>
             <div class="rcard-info"><span>📍</span> Rua Maria Rita Moreira da Silva, 245 · Campos do Jordão, SP</div>
             <div class="rcard-info"><span>📅</span> Check-in: <strong>Sex 26/06 às 15:00h</strong></div>
             <div class="rcard-info"><span>📅</span> Checkout: <strong>Dom 28/06 às 12:00h</strong></div>
             <div class="rcard-info"><span>✅</span> Confirmação: HMEC9PPXSD</div>
             <div class="rcard-amenities">
+              <span class="amenity">🏊 Piscina</span>
               <span class="amenity">♨️ Hidromassagem com cromoterapia</span>
               <span class="amenity">🌈 Vista panorâmica</span>
               <span class="amenity">🏡 Terraço exclusivo</span>
@@ -1202,13 +1203,14 @@ document.addEventListener('keydown', function(e) {
             <div class="rhorario">
               <div class="rh-time">15:00</div>
               <div class="rh-dot"></div>
-              <div class="rh-text"><strong>Check-in no chalé</strong> — explorar o espaço, relaxar, curtir a Hidro.</div>
+              <div class="rh-text"><strong>Check-in no chalé</strong> — explorar o espaço, relaxar, curtir a piscina.</div>
             </div>
             <div class="rhorario">
               <div class="rh-time">Noite</div>
               <div class="rh-dot rh-last"></div>
               <div class="rh-text"><strong>Noite no chalé</strong> — hidromassagem, jantar simples. Primeira noite na montanha. 🌙</div>
             </div>
+            <div class="rdia-gratuito">💡 Dica: leve queijos, chás e petiscos de SP para essa noite — economiza e é mais gostoso!</div>
           </div>
         </div>
 
