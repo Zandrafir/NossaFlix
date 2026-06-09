@@ -1,0 +1,1308 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NossaFlix</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --red: #E50914; --red-dark: #B20710;
+  --bg: #000; --surface: #141414; --surface2: #1f1f1f; --surface3: #2a2a2a;
+  --text: #fff; --text-muted: #a3a3a3; --rose: #ff6b8a;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100%;background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;overflow:hidden;cursor:none}
+
+/* CURSOR */
+.cursor{position:fixed;width:16px;height:16px;border:2px solid var(--red);border-radius:50%;pointer-events:none;transform:translate(-50%,-50%);transition:width .2s,height .2s,background .15s,border-color .2s;z-index:9999}
+.cursor.hover{width:40px;height:40px;border-color:#fff;background:rgba(255,255,255,.1)}
+.cursor.click{width:10px;height:10px;background:var(--red)}
+
+/* INTRO CINEMATICA */
+#intro{position:fixed;inset:0;background:#000;z-index:1000;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:0}
+#intro.done{animation:introOut .8s ease forwards}
+@keyframes introOut{to{opacity:0;pointer-events:none}}
+.intro-logo{font-family:'Bebas Neue',sans-serif;font-size:0px;letter-spacing:8px;color:var(--red);text-shadow:0 0 60px rgba(229,9,20,.8),0 0 120px rgba(229,9,20,.4);animation:logoReveal 2s ease forwards}
+@keyframes logoReveal{0%{font-size:0px;opacity:0;letter-spacing:40px}60%{font-size:72px;opacity:1;letter-spacing:8px}100%{font-size:72px;opacity:1;letter-spacing:8px}}
+.intro-bar{width:0;height:3px;background:var(--red);margin-top:20px;animation:barGrow 1.8s .5s ease forwards;box-shadow:0 0 20px rgba(229,9,20,.8)}
+@keyframes barGrow{to{width:200px}}
+.intro-sub{font-family:'Crimson Pro',serif;font-size:14px;letter-spacing:4px;color:var(--text-muted);margin-top:14px;opacity:0;animation:fadeIn .6s 1.6s ease forwards}
+
+/* PARTÍCULAS */
+#particles{position:fixed;inset:0;pointer-events:none;z-index:1;overflow:hidden}
+.particle{position:absolute;border-radius:50%;pointer-events:none;animation:particleFade linear infinite}
+@keyframes particleFade{0%{opacity:0;transform:translateY(0) scale(0)}20%{opacity:.6}80%{opacity:.3}100%{opacity:0;transform:translateY(-100vh) scale(1.5)}}
+
+/* PERFIS */
+#screen-profiles{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:48px;z-index:100;opacity:0;animation:fadeInUp .8s 2.4s ease forwards}
+@keyframes fadeInUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+#screen-profiles.hide{animation:profileOut .5s ease forwards;pointer-events:none}
+@keyframes profileOut{to{opacity:0;transform:scale(1.06)}}
+
+.profiles-logo{font-family:'Bebas Neue',sans-serif;font-size:52px;letter-spacing:6px;color:var(--red);text-shadow:0 0 40px rgba(229,9,20,.5)}
+.profiles-subtitle{font-family:'Crimson Pro',serif;font-size:22px;color:var(--text-muted);letter-spacing:2px;margin-top:-36px}
+.profiles-grid{display:flex;gap:40px}
+
+.profile-card{display:flex;flex-direction:column;align-items:center;gap:14px;cursor:pointer;transition:transform .3s}
+.profile-card:hover{transform:scale(1.1) translateY(-4px)}
+.profile-card:hover .profile-avatar{border-color:#fff;box-shadow:0 0 30px rgba(255,255,255,.2)}
+.profile-card:hover .profile-name{color:#fff}
+
+.profile-avatar{width:150px;height:150px;border-radius:8px;border:3px solid transparent;overflow:hidden;transition:all .3s;background:var(--surface2);display:flex;align-items:center;justify-content:center}
+.profile-avatar img{width:100%;height:100%;object-fit:cover}
+.avatar-placeholder{font-size:60px}
+.profile-name{font-size:17px;color:var(--text-muted);letter-spacing:1px;transition:color .2s;text-align:center;max-width:160px;font-family:'Crimson Pro',serif;font-style:italic}
+
+/* MAIN */
+#screen-main{position:fixed;inset:0;overflow-y:auto;overflow-x:hidden;opacity:0;pointer-events:none;transition:opacity .8s;scrollbar-width:thin;scrollbar-color:var(--surface3) transparent}
+#screen-main.show{opacity:1;pointer-events:all}
+
+/* HERO */
+.hero{position:relative;width:100%;height:88vh;min-height:500px;overflow:hidden}
+.hero-bg{position:absolute;inset:0;background:#000;display:flex;align-items:center;justify-content:center}
+.hero-bg img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 20%;opacity:.55;transition:transform 8s ease;transform:scale(1.05)}
+.hero:hover .hero-bg img{transform:scale(1)}
+.hero-gradient{position:absolute;inset:0;background:linear-gradient(to right,rgba(0,0,0,.9) 0%,rgba(0,0,0,.4) 55%,transparent 100%),linear-gradient(to top,rgba(0,0,0,.95) 0%,transparent 50%)}
+.hero-content{position:absolute;bottom:14%;left:5%;max-width:540px;animation:heroContentIn .8s ease}
+@keyframes heroContentIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.hero-badge{display:inline-flex;align-items:center;gap:6px;background:var(--red);color:#fff;font-size:11px;font-weight:500;letter-spacing:2px;padding:4px 10px;border-radius:3px;margin-bottom:16px;text-transform:uppercase;box-shadow:0 0 20px rgba(229,9,20,.4)}
+.hero-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(36px,5vw,68px);line-height:.95;letter-spacing:2px;text-shadow:0 4px 30px rgba(0,0,0,.8);margin-bottom:14px}
+.hero-meta{display:flex;align-items:center;gap:14px;font-size:13px;color:var(--text-muted);margin-bottom:14px}
+.hero-meta .match{color:#46d369;font-weight:500}
+.hero-desc{font-family:'Crimson Pro',serif;font-size:17px;line-height:1.65;color:rgba(255,255,255,.85);display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;margin-bottom:24px}
+.hero-btns{display:flex;gap:12px}
+.btn-play{display:flex;align-items:center;gap:8px;background:#fff;color:#000;font-weight:600;font-size:16px;padding:11px 28px;border-radius:4px;border:none;cursor:pointer;transition:all .2s;box-shadow:0 4px 20px rgba(0,0,0,.4)}
+.btn-play:hover{background:rgba(255,255,255,.85);transform:scale(1.03)}
+.btn-more{display:flex;align-items:center;gap:8px;background:rgba(109,109,110,.7);color:#fff;font-weight:500;font-size:16px;padding:11px 24px;border-radius:4px;border:none;cursor:pointer;transition:all .2s;backdrop-filter:blur(10px)}
+.btn-more:hover{background:rgba(109,109,110,.9);transform:scale(1.03)}
+
+/* NAVBAR */
+.navbar{position:fixed;top:0;left:0;right:0;z-index:50;padding:16px 5%;display:flex;align-items:center;gap:32px;background:linear-gradient(to bottom,rgba(0,0,0,.95),transparent);transition:background .3s}
+.navbar.scrolled{background:rgba(0,0,0,.97);backdrop-filter:blur(10px)}
+.nav-logo{font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:4px;color:var(--red);text-shadow:0 0 20px rgba(229,9,20,.4);flex-shrink:0}
+.nav-links{display:flex;gap:20px}
+.nav-link{font-size:14px;color:var(--text-muted);cursor:pointer;transition:color .15s;letter-spacing:.5px;position:relative}
+.nav-link::after{content:'';position:absolute;bottom:-4px;left:0;width:0;height:2px;background:var(--red);transition:width .3s}
+.nav-link:hover::after,.nav-link.active::after{width:100%}
+.nav-link:hover,.nav-link.active{color:#fff}
+.nav-right{margin-left:auto;display:flex;align-items:center;gap:16px}
+.nav-profile-mini{width:34px;height:34px;border-radius:4px;overflow:hidden;background:var(--surface2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:18px;border:2px solid transparent;transition:border-color .2s}
+.nav-profile-mini:hover{border-color:#fff}
+.nav-profile-mini img{width:100%;height:100%;object-fit:cover}
+
+/* ROWS */
+.catalog{padding:0 0 100px;position:relative;z-index:1}
+
+/* Fundo gradiente que vai escurecendo com toques de cor */
+.catalog::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:
+    radial-gradient(ellipse 80% 40% at 20% 60%, rgba(229,9,20,.06) 0%, transparent 70%),
+    radial-gradient(ellipse 60% 50% at 80% 80%, rgba(255,107,138,.05) 0%, transparent 70%),
+    radial-gradient(ellipse 50% 40% at 50% 100%, rgba(83,74,183,.06) 0%, transparent 70%)}
+
+.row{margin-bottom:60px;opacity:0;transform:translateY(30px);transition:opacity .7s ease,transform .7s ease;position:relative;z-index:1}
+.row.visible{opacity:1;transform:translateY(0)}
+.row-title{font-size:20px;font-weight:500;margin-bottom:18px;color:#fff;letter-spacing:.3px;display:flex;align-items:center;gap:10px;padding:0 5%}
+.row-title span{color:var(--red);font-size:14px;font-weight:400;cursor:pointer;opacity:0;transition:opacity .2s}
+.row:hover .row-title span{opacity:1}
+
+/* Linha decorativa abaixo do título da row */
+.row-title::after{content:'';flex:1;height:1px;background:linear-gradient(to right,rgba(229,9,20,.3),transparent);margin-left:12px}
+
+.cards-track{display:grid;grid-template-columns:repeat(auto-fill,160px);gap:14px;padding:4px 5% 16px;justify-content:start;overflow-x:visible}
+
+/* CARDS */
+.card{flex-shrink:0;width:160px;height:240px;border-radius:8px;overflow:hidden;position:relative;cursor:pointer;transition:transform .3s ease,box-shadow .3s ease,z-index 0s .3s;background:var(--surface2);border:1px solid rgba(255,255,255,.06)}
+.card:hover{transform:scale(1.14) translateY(-8px);z-index:10;transition:transform .3s ease,box-shadow .3s ease,z-index 0s;box-shadow:0 20px 50px rgba(0,0,0,.9),0 0 0 2px rgba(255,255,255,.2)}
+.card img{width:100%;height:100%;object-fit:cover;object-position:center top;transition:transform .4s ease;display:block}
+.card:hover img{transform:scale(1.06)}
+.card .card-placeholder{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:42px;background:linear-gradient(135deg,var(--surface2),var(--surface3))}
+.card-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.95) 0%,rgba(0,0,0,.2) 50%,transparent 100%);opacity:0;transition:opacity .25s;display:flex;flex-direction:column;justify-content:flex-end;padding:10px}
+.card:hover .card-overlay{opacity:1}
+.card-title-mini{font-size:12px;font-weight:500;line-height:1.3;margin-bottom:6px;text-shadow:0 1px 4px rgba(0,0,0,.8)}
+.card-actions{display:flex;gap:6px;align-items:center}
+.card-btn{width:28px;height:28px;border-radius:50%;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;transition:transform .15s,background .15s}
+.card-btn:hover{transform:scale(1.2)}
+.card-btn.play{background:#fff;color:#000}
+.card-btn.play:hover{background:#ddd}
+.card-btn.info{background:rgba(109,109,110,.7);color:#fff;border:1.5px solid rgba(255,255,255,.5)}
+.card-match{color:#46d369;font-size:10px;font-weight:500;margin-left:auto}
+
+/* SHIMMER nos cards sem foto */
+.card-placeholder{position:relative;overflow:hidden}
+.card-placeholder::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent 0%,rgba(255,255,255,.04) 50%,transparent 100%);animation:shimmer 2s infinite}
+@keyframes shimmer{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
+
+/* MODAL */
+#modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:200;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s;padding:20px;backdrop-filter:blur(6px)}
+#modal-overlay.show{opacity:1;pointer-events:all}
+.modal{width:100%;max-width:800px;max-height:92vh;background:var(--surface);border-radius:12px;overflow:hidden;transform:scale(.9) translateY(20px);transition:transform .35s cubic-bezier(.34,1.56,.64,1);overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--surface3) transparent;box-shadow:0 40px 100px rgba(0,0,0,.9)}
+#modal-overlay.show .modal{transform:scale(1) translateY(0)}
+.modal-hero{position:relative;width:100%;background:#000;display:flex;align-items:center;justify-content:center;min-height:280px;max-height:480px;overflow:hidden}
+.modal-hero img{position:relative;width:100%;height:auto;max-height:480px;object-fit:contain;object-position:center top;display:block}
+.modal-hero .modal-hero-placeholder{font-size:80px;opacity:.3}
+.modal-hero-gradient{position:absolute;inset:0;background:linear-gradient(to top,var(--surface) 0%,rgba(0,0,0,.1) 50%,transparent 100%);pointer-events:none}
+.modal-hero-title{position:absolute;bottom:20px;left:24px;right:24px;font-family:'Bebas Neue',sans-serif;font-size:clamp(28px,4vw,52px);line-height:.95;letter-spacing:2px;text-shadow:0 2px 16px rgba(0,0,0,.9)}
+.modal-close{position:absolute;top:14px;right:14px;width:34px;height:34px;border-radius:50%;background:rgba(20,20,20,.9);border:none;cursor:pointer;color:#fff;font-size:18px;display:flex;align-items:center;justify-content:center;transition:all .2s;z-index:10;backdrop-filter:blur(4px)}
+.modal-close:hover{background:var(--surface3);transform:scale(1.1)}
+.modal-body{padding:22px 26px 32px}
+.modal-meta{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:14px}
+.modal-match{color:#46d369;font-weight:600;font-size:15px}
+.modal-duration{font-size:14px;color:var(--text-muted);font-family:'Crimson Pro',serif;font-style:italic}
+.modal-badge{font-size:11px;border:1px solid var(--text-muted);padding:2px 7px;color:var(--text-muted);border-radius:2px}
+.modal-desc{font-family:'Crimson Pro',serif;font-size:17px;line-height:1.8;color:rgba(255,255,255,.9);margin-bottom:20px}
+.modal-heart{text-align:center;font-size:30px;margin-top:8px;animation:pulse 2s ease-in-out infinite}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.2)}}
+
+/* TOAST */
+#toast{position:fixed;bottom:40px;left:50%;transform:translateX(-50%) translateY(20px);background:rgba(30,30,30,.95);color:#fff;padding:12px 24px;border-radius:30px;font-size:14px;opacity:0;transition:all .4s;z-index:500;backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.1);pointer-events:none;white-space:nowrap}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* LOADING */
+#loading{position:fixed;inset:0;background:#000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;z-index:999;transition:opacity .8s}
+#loading.hide{opacity:0;pointer-events:none}
+.loading-logo{font-family:'Bebas Neue',sans-serif;font-size:64px;letter-spacing:8px;color:var(--red);animation:flicker 1.5s ease-in-out infinite;text-shadow:0 0 40px rgba(229,9,20,.6)}
+@keyframes flicker{0%,100%{opacity:1;text-shadow:0 0 40px rgba(229,9,20,.6)}50%{opacity:.7;text-shadow:0 0 80px rgba(229,9,20,1)}}
+.loading-bar{width:140px;height:3px;background:var(--surface2);border-radius:2px;overflow:hidden}
+.loading-fill{height:100%;background:var(--red);border-radius:2px;animation:load 2s ease-in-out forwards;box-shadow:0 0 10px rgba(229,9,20,.8)}
+@keyframes load{from{width:0}to{width:100%}}
+.loading-text{font-size:13px;color:var(--text-muted);letter-spacing:3px;animation:blink 1.2s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:.4}50%{opacity:1}}
+
+
+/* DIVISOR ENTRE ROWS */
+.row-divider{height:1px;margin:0 5%;background:linear-gradient(to right,transparent,rgba(255,255,255,.06),transparent)}
+
+/* FOOTER */
+.catalog-footer{text-align:center;padding:60px 5% 40px;position:relative;z-index:1}
+.catalog-footer::before{content:'';display:block;width:60px;height:2px;background:var(--red);margin:0 auto 24px;box-shadow:0 0 20px rgba(229,9,20,.6)}
+.footer-logo{font-family:'Bebas Neue',sans-serif;font-size:36px;letter-spacing:6px;color:var(--red);opacity:.4;text-shadow:0 0 30px rgba(229,9,20,.3)}
+.footer-text{font-family:'Crimson Pro',serif;font-size:15px;color:var(--text-muted);margin-top:8px;font-style:italic;opacity:.6}
+
+
+/* like removido - abrir card ja conta */
+
+/* MODAL FILME */
+#filme-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:200;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s;padding:20px;backdrop-filter:blur(8px)}
+#filme-modal-overlay.show{opacity:1;pointer-events:all}
+#filme-modal-overlay.show .modal{transform:scale(1) translateY(0)}
+.filme-btns{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.btn-like-filme{width:44px;height:44px;border-radius:50%;border:2px solid rgba(255,255,255,.3);background:transparent;color:#fff;font-size:20px;cursor:pointer;transition:all .3s;display:flex;align-items:center;justify-content:center}
+.btn-like-filme:hover{transform:scale(1.1);border-color:#fff}
+.btn-like-filme.liked{border-color:#46d369;background:rgba(70,211,105,.15)}
+
+/* MODAL DESBLOQUEIO */
+#unlock-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:300;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .5s;text-align:center;backdrop-filter:blur(12px)}
+#unlock-modal-overlay.show{opacity:1;pointer-events:all}
+.unlock-modal{position:relative;padding:50px 40px;max-width:520px}
+.unlock-sparkles{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.sparkle{position:absolute;border-radius:50%;animation:sparkleFly 1.5s ease forwards}
+@keyframes sparkleFly{0%{opacity:1;transform:translate(0,0) scale(1)}100%{opacity:0;transform:translate(var(--tx),var(--ty)) scale(0)}}
+
+/* BOTÃO BLOQUEADO */
+.btn-play.locked{background:rgba(255,255,255,.15);color:rgba(255,255,255,.6);cursor:pointer}
+.btn-play.locked:hover{background:rgba(255,255,255,.2)}
+.btn-play.unlocked{background:#fff;color:#000}
+
+
+/* PLAYER DE VÍDEO */
+#video-overlay{position:fixed;inset:0;background:rgba(0,0,0,.96);z-index:400;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .4s;backdrop-filter:blur(10px)}
+#video-overlay.show{opacity:1;pointer-events:all}
+.video-wrap{position:relative;width:min(90vw,1100px);aspect-ratio:16/9;background:#000;border-radius:10px;overflow:hidden;box-shadow:0 40px 100px rgba(0,0,0,.9)}
+.video-close{position:absolute;top:14px;right:14px;z-index:10;width:38px;height:38px;border-radius:50%;background:rgba(0,0,0,.7);border:none;color:#fff;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;backdrop-filter:blur(4px)}
+.video-close:hover{background:var(--red);transform:scale(1.1)}
+
+
+/* SPOTIFY */
+#spotify-container{
+  position:fixed;bottom:24px;right:24px;z-index:150;
+  display:flex;flex-direction:column;align-items:flex-end;gap:8px;
+}
+#spotify-btn{
+  width:48px;height:48px;border-radius:50%;
+  background:#1DB954;border:none;cursor:pointer;
+  font-size:20px;display:flex;align-items:center;justify-content:center;
+  box-shadow:0 4px 20px rgba(29,185,84,.4);
+  transition:all .25s;order:2;
+}
+#spotify-btn:hover{transform:scale(1.1);box-shadow:0 6px 28px rgba(29,185,84,.6)}
+#spotify-wrap{
+  width:280px;
+  max-height:0;opacity:0;overflow:hidden;
+  transition:max-height .45s ease, opacity .4s ease;
+  order:1;
+}
+#spotify-wrap.open{max-height:200px;opacity:1;}
+
+
+/* ════════════════════════════════════════════
+   ROTEIRO DA VIAGEM
+════════════════════════════════════════════ */
+#roteiro-overlay{position:fixed;inset:0;background:var(--bg);z-index:350;opacity:0;pointer-events:none;transition:opacity .5s;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--surface3) transparent}
+#roteiro-overlay.show{opacity:1;pointer-events:all}
+
+/* Header */
+.roteiro-header{position:sticky;top:0;z-index:10;display:flex;align-items:center;justify-content:space-between;padding:16px 5%;background:rgba(0,0,0,.9);backdrop-filter:blur(10px);border-bottom:1px solid rgba(255,255,255,.06)}
+.roteiro-back{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:#fff;padding:8px 16px;border-radius:20px;cursor:pointer;font-size:14px;transition:all .2s}
+.roteiro-back:hover{background:rgba(255,255,255,.15)}
+.roteiro-logo{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:4px;color:var(--red)}
+
+/* Hero */
+.roteiro-hero{position:relative;height:70vh;min-height:400px;overflow:hidden;display:flex;align-items:flex-end}
+.roteiro-hero-bg{position:absolute;inset:0}
+.roteiro-hero-slideshow{width:100%;height:100%;position:relative;background:#000}
+.rh-slide{position:absolute;inset:0;transition:opacity 1.2s ease}
+.roteiro-hero-gradient{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.95) 0%,rgba(0,0,0,.3) 50%,transparent 100%)}
+.roteiro-hero-content{position:relative;padding:40px 5%;z-index:1;width:100%}
+.roteiro-badge{display:inline-block;background:var(--red);color:#fff;font-size:11px;font-weight:600;letter-spacing:2px;padding:4px 12px;border-radius:3px;margin-bottom:14px;text-transform:uppercase}
+.roteiro-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(48px,8vw,90px);line-height:.9;letter-spacing:2px;margin-bottom:8px;text-shadow:0 4px 30px rgba(0,0,0,.8)}
+.roteiro-subtitle{font-family:'Crimson Pro',serif;font-size:18px;color:rgba(255,255,255,.75);margin-bottom:20px;font-style:italic}
+.roteiro-stats{display:flex;gap:0;align-items:center}
+.rstat{display:flex;flex-direction:column;align-items:center;padding:0 20px}
+.rstat-n{font-family:'Bebas Neue',sans-serif;font-size:28px;color:#fff;line-height:1}
+.rstat-l{font-size:11px;color:rgba(255,255,255,.5);letter-spacing:1px;text-transform:uppercase;margin-top:2px}
+.rstat-div{width:1px;height:30px;background:rgba(255,255,255,.2)}
+
+/* Content */
+.roteiro-content{max-width:900px;margin:0 auto;padding:40px 5% 80px}
+.roteiro-section{margin-bottom:50px}
+.roteiro-section-title{font-size:22px;font-weight:600;color:#fff;margin-bottom:20px;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,.08);display:flex;align-items:center;gap:10px}
+
+/* Cards grid */
+.roteiro-cards-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}
+.rcard{border-radius:10px;overflow:hidden;border:1px solid rgba(255,255,255,.08);transition:transform .2s,box-shadow .2s}
+.rcard:hover{transform:translateY(-3px);box-shadow:0 12px 40px rgba(0,0,0,.4)}
+.rcard-blue{background:linear-gradient(135deg,rgba(24,95,165,.15),rgba(24,95,165,.05))}
+.rcard-pink{background:linear-gradient(135deg,rgba(212,83,126,.15),rgba(212,83,126,.05))}
+.rcard-verde{background:linear-gradient(135deg,rgba(27,67,50,.4),rgba(27,67,50,.2))}
+.rcard-body{padding:20px}
+.rcard-tag{font-size:10px;font-weight:700;letter-spacing:2px;color:var(--red);margin-bottom:8px;text-transform:uppercase}
+.rcard-title{font-size:18px;font-weight:600;color:#fff;margin-bottom:12px}
+.rcard-info{display:flex;gap:8px;align-items:flex-start;font-size:14px;color:rgba(255,255,255,.75);margin-bottom:6px;line-height:1.5}
+.rcard-info span{flex-shrink:0;width:20px}
+.rcard-amenities{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.amenity{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);padding:4px 10px;border-radius:20px;font-size:12px;color:rgba(255,255,255,.8)}
+.rcard-map-btn{display:inline-flex;align-items:center;gap:6px;margin-top:14px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff;padding:8px 16px;border-radius:20px;font-size:13px;text-decoration:none;transition:all .2s}
+.rcard-map-btn:hover{background:rgba(255,255,255,.2)}
+
+/* Dias */
+.rdia{margin-bottom:24px;border-radius:10px;overflow:hidden;border:1px solid rgba(255,255,255,.06)}
+.rdia-header{display:flex;align-items:center;gap:12px;padding:14px 20px;flex-wrap:wrap}
+.rdia-blue{background:linear-gradient(to right,rgba(24,95,165,.3),rgba(24,95,165,.1))}
+.rdia-pink{background:linear-gradient(to right,rgba(212,83,126,.3),rgba(212,83,126,.1))}
+.rdia-gold{background:linear-gradient(to right,rgba(201,168,76,.3),rgba(201,168,76,.1))}
+.rdia-num{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:1px;color:#fff}
+.rdia-data{font-size:14px;color:rgba(255,255,255,.7)}
+.rdia-tema{font-size:12px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,.5);margin-left:auto}
+.rdia-body{padding:20px;background:rgba(255,255,255,.02)}
+.rhorario{display:grid;grid-template-columns:60px 16px 1fr;gap:0 12px;margin-bottom:16px;align-items:start}
+.rh-time{font-size:12px;font-weight:600;color:var(--red);text-align:right;padding-top:2px;line-height:1.4}
+.rh-dot{width:10px;height:10px;border-radius:50%;background:var(--red);margin-top:4px;position:relative;flex-shrink:0}
+.rh-dot::after{content:'';position:absolute;top:10px;left:4px;width:1px;height:calc(100% + 12px);background:rgba(229,9,20,.2)}
+.rh-last::after{display:none}
+.rh-text{font-size:14px;color:rgba(255,255,255,.85);line-height:1.6}
+.rh-preco{margin-top:6px;font-size:12px;color:rgba(255,255,255,.45);background:rgba(255,255,255,.04);padding:4px 10px;border-radius:4px;display:inline-block}
+.rdia-gratuito{margin-top:12px;padding:10px 14px;background:rgba(64,145,108,.1);border:1px solid rgba(64,145,108,.2);border-radius:6px;font-size:13px;color:rgba(255,255,255,.6)}
+
+
+
+/* Final */
+.roteiro-final{text-align:center;padding:50px 20px;font-family:'Crimson Pro',serif;font-size:18px;color:rgba(255,255,255,.75);line-height:1.8;border-top:1px solid rgba(255,255,255,.06)}
+.roteiro-final-heart{font-size:40px;margin-bottom:16px;animation:pulse 2s ease-in-out infinite}
+
+/* FOCUS TV */
+.card:focus,.profile-card:focus,.btn-play:focus,.btn-more:focus{outline:3px solid var(--red);outline-offset:3px}
+
+/* FADE IN ROWS */
+@keyframes fadeIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div id="particles"></div>
+
+<!-- LOADING -->
+<div id="loading">
+  <div class="loading-logo">NOSSAFLIX</div>
+  <div class="loading-bar"><div class="loading-fill"></div></div>
+  <div class="loading-text">CARREGANDO...</div>
+</div>
+
+<!-- PERFIS -->
+<div id="screen-profiles">
+  <div class="profiles-logo">NOSSAFLIX</div>
+  <div class="profiles-subtitle">Quem está assistindo?</div>
+  <div class="profiles-grid">
+    <div class="profile-card" onclick="enterProfile()" tabindex="0" onkeydown="if(event.key==='Enter')enterProfile()">
+      <div class="profile-avatar" id="profile-avatar">
+        <img src="Fotos/ela.jpg" alt="Para Minha Pretinha" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+        <span class="avatar-placeholder" style="display:none">🌹</span>
+      </div>
+      <div class="profile-name">Para Minha Pretinha 🌹</div>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div id="screen-main">
+  <nav class="navbar" id="navbar">
+    <div class="nav-logo">NOSSAFLIX</div>
+    <div class="nav-links">
+      <span class="nav-link active">Início</span>
+      <span class="nav-link">Nossa História</span>
+      <span class="nav-link">Em Breve</span>
+    </div>
+    <div class="nav-right">
+      <div class="nav-profile-mini" onclick="backToProfiles()" title="Trocar perfil">
+        <img src="Fotos/ela.jpg" alt="" onerror="this.style.display='none';this.parentElement.textContent='🌹'">
+      </div>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <div class="hero" id="hero">
+    <div class="hero-bg" id="hero-bg">
+      <img src="Fotos/nos1.jpg" alt="Nós dois" onerror="this.style.display='none'">
+    </div>
+    <div class="hero-gradient"></div>
+    <div class="hero-content">
+      <div class="hero-badge">⭐ EM DESTAQUE</div>
+      <div class="hero-title" id="hero-title">OS MELHORES<br>11 MESES</div>
+      <div class="hero-meta">
+        <span class="match">💚 99% Combinação</span>
+        <span>11 meses · 28 dias</span>
+        <span style="border:1px solid #666;padding:1px 6px;border-radius:2px;font-size:11px">AMOR</span>
+      </div>
+      <div class="hero-desc" id="hero-desc">Uma história real de amor, cumplicidade e crescimento. Protagonizada por duas pessoas que escolheram um ao outro — e continuam escolhendo todo dia.</div>
+      <div class="hero-btns">
+        <button class="btn-play" id="btn-assistir" onclick="handleAssistir()">🔒 Assistir</button>
+        <button class="btn-more" onclick="openFilmeModal()">ℹ Mais Detalhes</button>
+      </div>
+      <div id="progress-bar-wrap" style="margin-top:14px;display:none">
+        <div style="font-size:12px;color:#a3a3a3;margin-bottom:6px" id="progress-label">0 de 18 momentos revisitados</div>
+        <div style="width:220px;height:4px;background:rgba(255,255,255,.15);border-radius:2px;overflow:hidden">
+          <div id="progress-fill" style="height:100%;width:0%;background:linear-gradient(to right,#E50914,#ff6b8a);border-radius:2px;transition:width .5s ease"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CATÁLOGO -->
+  <div class="catalog">
+    <div class="row" id="r-nosso"><div class="row-title">💑 Nós Dois <span>Ver tudo</span></div><div class="cards-track" id="row-nosso"></div></div>
+    <div class="row-divider"></div>
+    <div class="row" id="r-ela"><div class="row-title">🌹 Ela <span>Ver tudo</span></div><div class="cards-track" id="row-ela"></div></div>
+    <div class="row-divider"></div>
+    <div class="row" id="r-lugares"><div class="row-title">📍 Lugares Nossos <span>Ver tudo</span></div><div class="cards-track" id="row-lugares"></div></div>
+    <div class="row-divider"></div>
+    <div class="row" id="r-especial"><div class="row-title">⭐ Momentos Especiais <span>Ver tudo</span></div><div class="cards-track" id="row-especial"></div></div>
+    <div class="row-divider"></div>
+    <div class="row" id="r-embreve"><div class="row-title">🔮 Em Breve <span>Ver tudo</span></div><div class="cards-track" id="row-embreve"></div></div>
+    <div class="catalog-footer">
+      <div class="footer-logo">NOSSAFLIX</div>
+      <div class="footer-text">Uma história de amor. Desde sempre. ❤</div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL CARD NORMAL -->
+<div id="modal-overlay" onclick="closeModalOutside(event)">
+  <div class="modal" id="modal">
+    <div class="modal-hero">
+      <div id="modal-img-wrap"></div>
+      <div class="modal-hero-gradient"></div>
+      <div class="modal-hero-title" id="modal-title"></div>
+      <button class="modal-close" onclick="closeModal()">&#x2715;</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-meta">
+        <span class="modal-match">&#x1F49A; 99% Combinação</span>
+        <span class="modal-duration" id="modal-duration"></span>
+        <span class="modal-badge">AMOR</span>
+      </div>
+      <div class="modal-desc" id="modal-desc"></div>
+      <div class="modal-like-row" id="modal-like-row"></div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL FILME DESBLOQUEÁVEL -->
+<div id="filme-modal-overlay" onclick="closeFilmeModalOutside(event)">
+  <div class="modal" id="filme-modal">
+    <div class="modal-hero" style="min-height:320px">
+      <img src="Fotos/nos1.jpg" alt="Nossa História" style="width:100%;height:100%;object-fit:cover;opacity:.7;position:absolute;inset:0" onerror="this.style.display='none'">
+      <div class="modal-hero-gradient"></div>
+      <div class="modal-hero-title">FEITOS UM PARA O OUTRO</div>
+      <button class="modal-close" onclick="closeFilmeModal()">&#x2715;</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-meta">
+        <span class="modal-match">&#x1F49A; 100% Combinação</span>
+        <span class="modal-duration" style="font-family:'Crimson Pro',serif;font-style:italic;color:#a3a3a3">2025 · 1 Temporada · Amor Real</span>
+        <span class="modal-badge">EXCLUSIVO</span>
+      </div>
+      <div style="font-family:'Crimson Pro',serif;font-size:17px;line-height:1.8;color:rgba(255,255,255,.9);margin-bottom:16px">
+        A história real de dois vizinhos que nunca se conheceram, colegas que nunca se viram, e estudantes que o destino finalmente colocou na mesma sala. Uma animação sobre amor, timing e a certeza de que algumas histórias já estavam escritas.
+      </div>
+      <div style="font-size:13px;color:#a3a3a3;margin-bottom:6px"><strong style="color:#fff">Direção:</strong> Feito com amor</div>
+      <div style="font-size:13px;color:#a3a3a3;margin-bottom:20px"><strong style="color:#fff">Protagonistas:</strong> Você e eu, meu amor ❤</div>
+      <div class="filme-btns">
+        <button class="btn-play" id="btn-assistir-agora" onclick="assistirFilme()" style="gap:8px">&#9654; Assistir Agora</button>
+        <button class="btn-more" onclick="closeFilmeModal()" style="gap:8px">&#x2715; Fechar</button>
+        <button class="btn-like-filme" id="btn-like-filme" onclick="toggleLikeFilme()" title="Gostei">&#x1F44D;</button>
+      </div>
+      <div id="filme-locked-msg" style="display:none;margin-top:20px;text-align:center;padding:20px;border-radius:8px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08)">
+        <div style="font-size:28px;margin-bottom:10px">🔒</div>
+        <div style="font-family:'Crimson Pro',serif;font-size:17px;line-height:1.7;color:rgba(255,255,255,.85)">
+          Sei que está curiosa e te garanto que muitas emoções te aguardam aqui,<br>
+          mas antes de prosseguir porque não dá uma espiadinha<br>
+          no nosso catálogo abaixo primeiro?<br><br>
+          <em style="color:#ff6b8a">Relembre alguns de nossos momentos,<br>e depois volte para conferir essa novidade.</em>
+        </div>
+        <div style="margin-top:14px;font-size:13px;color:#666" id="locked-progress-text"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL DESBLOQUEIO -->
+<div id="unlock-modal-overlay">
+  <div class="unlock-modal">
+    <div class="unlock-sparkles" id="unlock-sparkles"></div>
+    <div style="font-size:52px;margin-bottom:16px;animation:pulse 1.5s infinite">🎉</div>
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:3px;color:#fff;margin-bottom:12px">DESBLOQUEADO!</div>
+    <div style="font-family:'Crimson Pro',serif;font-size:18px;line-height:1.7;color:rgba(255,255,255,.9);max-width:400px;text-align:center">
+      Agora que você já reviveu nossos momentos,<br>
+      <em style="color:#ff6b8a">volte no início para relembrar nossa história.</em>
+    </div>
+    <button onclick="closeUnlockModal()" style="margin-top:28px;background:var(--red);color:#fff;border:none;padding:12px 32px;border-radius:30px;font-size:15px;cursor:pointer;font-weight:600;letter-spacing:1px;transition:all .2s;box-shadow:0 0 30px rgba(229,9,20,.5)">
+      &#9654; Ir Assistir Agora
+    </button>
+  </div>
+</div>
+
+<!-- MODAL CARD NORMAL estava aqui -->
+
+
+<!-- PLAYER DE VÍDEO -->
+<div id="video-overlay">
+  <div class="video-wrap">
+    <button class="video-close" onclick="closeVideo()">&#x2715;</button>
+    <video id="main-video" controls playsinline preload="metadata"
+      style="width:100%;height:100%;background:#000;outline:none">
+      <source src="exemplo.mp4" type="video/mp4">
+      Seu navegador nao suporta video HTML5.
+    </video>
+  </div>
+</div>
+
+
+<!-- SPOTIFY WIDGET -->
+<div id="spotify-container">
+  <button id="spotify-btn" onclick="toggleSpotify()" title="Música">🎵</button>
+  <div id="spotify-wrap">
+    <iframe id="spotify-frame"
+      src="https://open.spotify.com/embed/playlist/1i3p8BExX1e61Q87pRZlDU?utm_source=generator&theme=0"
+      width="280" height="152" frameBorder="0" allowtransparency="true"
+      allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+      loading="lazy" style="border-radius:8px;display:block"></iframe>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<script>
+// ════════════════════════════════════════════
+// DADOS — edite aqui
+// ════════════════════════════════════════════
+const data = {
+  nosso: [
+    { img:"Fotos/nos1.jpg", emoji:"💑", title:"Os Melhores 11 Meses", duration:"11 meses · e muitos anos por vir", desc:"Uma história real de amor, cumplicidade e crescimento. Protagonizada por duas pessoas que escolheram um ao outro — e continuam escolhendo todo dia. Escreva aqui a sinopse desse momento especial." },
+    { img:"Fotos/nos2.jpg", emoji:"🌸", title:"Entre Flores", duration:"2018 · Um passeio inesquecível", desc:"Escreva sobre esse passeio no parque. O que vocês estavam sentindo, o que falaram, o que ficou guardado." },
+    { img:"Fotos/nos3.jpg", emoji:"🎈", title:"Noite de Surpresa", duration:"2018 · Quando tudo ficou rosa", desc:"Aquela noite que você decorou com balões e fotos na parede. Escreva o que ela disse quando entrou no quarto." },
+    { img:"Fotos/nos4.jpg", emoji:"😜", title:"Nós Sendo Nós", duration:"Pra sempre · Sem filtro", desc:"Aquele jeito que a gente tem de ser completamente ridículo junto — e amar isso." },
+    { img:"Fotos/nos5.jpg", emoji:"🍽️", title:"Nossa Mesa", duration:"Cada encontro · Cada jantar", desc:"Sobre os jantares juntos, as risadas à mesa, e como cada refeição compartilhada virou uma memória." },
+  ],
+  ela: [
+    { img:"Fotos/ela.jpg", emoji:"🌹", title:"Ela e as Rosas", duration:"Uma vida inteira · A protagonista", desc:"Escreva aqui sobre ela — quem ela é, o que você ama nela, como ela te surpreende todo dia." },
+    { img:"Fotos/ela2.jpg", emoji:"🐰", title:"O Lado Fofo Dela", duration:"Todo dia · De mil formas", desc:"Aquele jeito dela de ser fofa sem querer. Escreva sobre um desses momentos." },
+    { img:"Fotos/ela3.jpg", emoji:"🎉", title:"O Sorriso Dela", duration:"Sempre · O melhor espetáculo", desc:"Sobre o sorriso dela quando é de verdade — do jeito que ilumina o ambiente inteiro." },
+    { img:"Fotos/ela4.jpg", emoji:"💐", title:"Quando Ela é Surpreendida", duration:"Cada vez · Vale sempre", desc:"Sobre como ela reage quando você faz algo especial pra ela." },
+  ],
+  lugares: [
+    { img:"Fotos/lugar1.jpg", emoji:"🍷", title:"São Roque", duration:"2019 · Uma tarde especial", desc:"Aquele passeio em São Roque. Escreva o que foi mais especial nesse dia." },
+    { img:"Fotos/lugar2.jpg", emoji:"🌺", title:"No Interior", duration:"2019 · Natureza e nós dois", desc:"Escreva sobre esse passeio — o que você sentiu estando naquele lugar com ela." },
+    { img:"Fotos/lugar3.jpg", emoji:"🌊", title:"Nossa Praia", duration:"2020 · Areia e sol", desc:"Sobre esse dia no mar. O que vocês fizeram, o que sentiram." },
+    { img:"Fotos/lugar4.jpg", emoji:"🌴", title:"Cidade Grande", duration:"2020 · Explorando juntos", desc:"Sobre explorar a cidade juntos. Escreva sobre o que é diferente quando ela está do seu lado." },
+  ],
+  especial: [
+    { img:"Fotos/especial1.jpg", emoji:"🎓", title:"A Colação", duration:"2018 · Um dia histórico", desc:"O dia da sua colação de grau — e ela lá, do seu lado. Escreva o que significou ter ela nesse momento." },
+    { img:"Fotos/especial2.jpg", emoji:"🥙", title:"Habib's", duration:"2019 · Os lugares simples", desc:"Sobre como os lugares mais simples viram especiais quando é com ela." },
+    { img:"Fotos/especial3.jpg", emoji:"✨", title:"Nós Dois", duration:"Sempre · A nossa foto", desc:"Escreva o que você pensa quando olha pra essa foto. O que você vê além da imagem." },
+    { img:"Fotos/especial4.jpg", emoji:"☕", title:"Tarde de Semana", duration:"Qualquer dia · Com ela", desc:"Sobre as tardes comuns que viraram especiais só por estarem juntos." },
+    { img:"Fotos/especial5.jpg", emoji:"💝", title:"A Surpresa", duration:"2019 · Quando ela viu", desc:"A reação dela quando viu a surpresa. Escreva o que você sentiu ao ver o rosto dela naquele momento." },
+  ],
+  embreve: [
+    { img:"", emoji:"🔮", title:"Em Breve", duration:"Em breve · Aguarde", desc:"Algo especial está a caminho. Volte em breve." },
+    { img:"", emoji:"🎬", title:"Em Breve", duration:"Em breve · Aguarde", desc:"Algo especial está a caminho. Volte em breve." },
+    { img:"", emoji:"✨", title:"Em Breve", duration:"Em breve · Aguarde", desc:"Algo especial está a caminho. Volte em breve." },
+  ]
+};
+
+// ════════════════════════════════════════════
+// PARTÍCULAS
+// ════════════════════════════════════════════
+function createParticles() {
+  const container = document.getElementById('particles');
+  for (let i = 0; i < 25; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    const size = Math.random() * 3 + 1;
+    const x = Math.random() * 100;
+    const duration = Math.random() * 15 + 10;
+    const delay = Math.random() * 10;
+    const colors = ['rgba(229,9,20,.3)','rgba(255,107,138,.2)','rgba(255,255,255,.1)'];
+    const color = colors[Math.floor(Math.random()*colors.length)];
+    p.style.cssText = `width:${size}px;height:${size}px;left:${x}%;bottom:-10px;background:${color};animation-duration:${duration}s;animation-delay:${delay}s`;
+    container.appendChild(p);
+  }
+}
+
+// ════════════════════════════════════════════
+// RENDER
+// ════════════════════════════════════════════
+function renderAll() {
+  renderRow('row-nosso', data.nosso);
+  renderRow('row-ela', data.ela);
+  renderRow('row-lugares', data.lugares);
+  renderRow('row-especial', data.especial);
+  renderRow('row-embreve', data.embreve, true);
+}
+
+function renderRow(id, items, emBreve) {
+  emBreve = emBreve || false;
+  var track = document.getElementById(id);
+  items.forEach(function(item, i) {
+    var card = document.createElement('div');
+    card.className = 'card';
+    card.tabIndex = 0;
+    var breveTag = emBreve ? '<br><small style="font-size:10px;color:#888">EM BREVE</small>' : '';
+    if (item.img) {
+      var img = document.createElement('img');
+      img.src = item.img;
+      img.alt = item.title;
+      img.loading = 'lazy';
+      img.style.cssText = 'width:100%;height:100%;object-fit:cover;object-position:center top;display:block';
+      (function(c, em, bt) {
+        img.onerror = function() {
+          var ph = document.createElement('div');
+          ph.className = 'card-placeholder';
+          ph.innerHTML = em + bt;
+          c.replaceChild(ph, this);
+        };
+      })(card, item.emoji, breveTag);
+      card.appendChild(img);
+    } else {
+      var ph = document.createElement('div');
+      ph.className = 'card-placeholder';
+      ph.innerHTML = item.emoji + breveTag;
+      card.appendChild(ph);
+    }
+    var overlay = document.createElement('div');
+    overlay.className = 'card-overlay';
+    overlay.innerHTML = '<div class="card-title-mini">' + item.title + '</div>'
+      + '<div class="card-actions">'
+      + '<button class="card-btn play">&#9654;</button>'
+      + '<button class="card-btn info">+</button>'
+      + '<span class="card-match">99%</span>'
+      + '</div>';
+    card.appendChild(overlay);
+    (function(r) {
+      card.addEventListener('click', function() { openModal(r); });
+      card.addEventListener('keydown', function(e) { if(e.key === 'Enter') openModal(r); });
+    })({ row: id, index: i });
+    track.appendChild(card);
+  });
+}
+
+// ════════════════════════════════════════════
+// MODAL
+// ════════════════════════════════════════════
+function getItem(ref) {
+  const map = { 'row-nosso':data.nosso,'row-ela':data.ela,'row-lugares':data.lugares,'row-especial':data.especial,'row-embreve':data.embreve };
+  return map[ref.row][ref.index];
+}
+
+// ════════════════════════════════════════════
+// SISTEMA DE LIKES / DESBLOQUEIO
+// ════════════════════════════════════════════
+var likedCards = {};
+var totalCards = 0;
+var filmeUnlocked = false;
+var filmeLiked = false;
+
+function countTotalCards() {
+  totalCards = data.nosso.length + data.ela.length + data.lugares.length + data.especial.length;
+}
+function getLikedCount() { return Object.keys(likedCards).length; }
+function updateProgress() {
+  var count = getLikedCount();
+  var label = document.getElementById('progress-label');
+  var fill = document.getElementById('progress-fill');
+  var wrap = document.getElementById('progress-bar-wrap');
+  if (wrap) wrap.style.display = 'block';
+  if (label) label.textContent = count + ' de ' + totalCards + ' momentos revisitados';
+  if (fill) fill.style.width = Math.round((count / totalCards) * 100) + '%';
+  if (count >= totalCards && !filmeUnlocked) {
+    filmeUnlocked = true;
+    var btn = document.getElementById('btn-assistir');
+    if (btn) { btn.innerHTML = '&#9654; Assistir'; btn.classList.remove('locked'); btn.classList.add('unlocked'); }
+    setTimeout(function() { showUnlockModal(); }, 400);
+  }
+}
+function toggleLike(rowId, index) {
+  var key = rowId + ':' + index;
+  var was = likedCards[key];
+  if (was) { delete likedCards[key]; } else { likedCards[key] = true; }
+  updateProgress();
+  return !was;
+}
+
+var currentModalRef = null;
+
+function openModal(ref) {
+  var item = typeof ref === 'number' ? data.nosso[ref] : getItem(ref);
+  currentModalRef = ref;
+  document.getElementById('modal-title').textContent = item.title;
+  document.getElementById('modal-duration').textContent = item.duration;
+  document.getElementById('modal-desc').textContent = item.desc;
+  var wrap = document.getElementById('modal-img-wrap');
+  if (item.img) {
+    var imgEl = document.createElement('img');
+    imgEl.src = item.img;
+    imgEl.alt = item.title;
+    imgEl.style.cssText = 'width:100%;height:auto;max-height:480px;object-fit:contain;display:block';
+    (function(w, emoji) {
+      imgEl.onerror = function() { w.innerHTML = '<div style="padding:80px;font-size:60px;text-align:center">' + emoji + '</div>'; };
+    })(wrap, item.emoji);
+    wrap.innerHTML = '';
+    wrap.appendChild(imgEl);
+  } else {
+    wrap.innerHTML = '<div style="padding:80px;font-size:60px;text-align:center">' + item.emoji + '</div>';
+  }
+  var rowId = (typeof ref === 'object') ? ref.row : 'row-nosso';
+  var idx = (typeof ref === 'object') ? ref.index : ref;
+  var isEmBreve = (rowId === 'row-embreve');
+
+  // Abrir o card já conta como visto — sem precisar clicar em nada
+  if (!isEmBreve) {
+    var key = rowId + ':' + idx;
+    if (!likedCards[key]) {
+      likedCards[key] = true;
+      updateProgress();
+    }
+  }
+
+  // Limpar a linha do like — não mostra mais botão
+  var likeRow = document.getElementById('modal-like-row');
+  if (likeRow) likeRow.innerHTML = '';
+  document.getElementById('modal-overlay').classList.add('show');
+  document.body.style.overflow = 'hidden';
+
+}
+
+function handleCardLike() {
+  if (!currentModalRef) return;
+  var rowId = (typeof currentModalRef === 'object') ? currentModalRef.row : 'row-nosso';
+  var idx = (typeof currentModalRef === 'object') ? currentModalRef.index : currentModalRef;
+  var nowLiked = toggleLike(rowId, idx);
+  var btn = document.getElementById('modal-like-btn');
+  if (!btn) return;
+  if (nowLiked) {
+    btn.classList.add('liked');
+    btn.innerHTML = '<span style="font-size:20px">&#x1F49A;</span><span class="like-label">Momento registrado!</span><span style="margin-left:auto;font-size:18px">&#x2713;</span>';
+  } else {
+    btn.classList.remove('liked');
+    btn.innerHTML = '<span style="font-size:20px">&#x1F44D;</span><span class="like-label">Gostei desse momento</span>';
+  }
+  btn.focus();
+}
+
+
+
+// ════════════════════════════════════════════
+// MODAL FILME
+// ════════════════════════════════════════════
+function openFilmeModal() {
+  var overlay = document.getElementById('filme-modal-overlay');
+  var btnAgora = document.getElementById('btn-assistir-agora');
+  var lockedMsg = document.getElementById('filme-locked-msg');
+  var count = getLikedCount();
+  if (filmeUnlocked) {
+    if (btnAgora) btnAgora.style.display = 'flex';
+    if (lockedMsg) lockedMsg.style.display = 'none';
+  } else {
+    if (btnAgora) btnAgora.style.display = 'none';
+    if (lockedMsg) {
+      lockedMsg.style.display = 'block';
+      var pt = document.getElementById('locked-progress-text');
+      if (pt) pt.textContent = count + ' de ' + totalCards + ' momentos revisitados';
+    }
+  }
+  overlay.classList.add('show');
+  document.body.style.overflow = 'hidden';
+}
+function closeFilmeModal() {
+  document.getElementById('filme-modal-overlay').classList.remove('show');
+  document.body.style.overflow = '';
+}
+function closeFilmeModalOutside(e) { if(e.target===document.getElementById('filme-modal-overlay')) closeFilmeModal(); }
+function handleAssistir() { openFilmeModal(); }
+function assistirFilme() {
+  if (!filmeUnlocked) return;
+  closeFilmeModal();
+  var overlay = document.getElementById('video-overlay');
+  overlay.classList.add('show');
+  document.body.style.overflow = 'hidden';
+  setTimeout(function() {
+    var v = document.getElementById('main-video');
+    v.play().catch(function(){});
+  }, 300);
+}
+function closeVideo() {
+  document.getElementById('video-overlay').classList.remove('show');
+  var v = document.getElementById('main-video');
+  v.pause();
+  v.currentTime = 0;
+  document.body.style.overflow = '';
+  // Perguntar se quer ver o roteiro
+  setTimeout(function() {
+    showToast('🗺️ Confira o roteiro completo da viagem abaixo!');
+    setTimeout(function() { openRoteiro(); }, 1500);
+  }, 400);
+}
+function openRoteiro() {
+  document.getElementById('roteiro-overlay').classList.add('show');
+  document.getElementById('roteiro-overlay').scrollTop = 0;
+  document.body.style.overflow = 'hidden';
+  setTimeout(startSlideshow, 500);
+}
+function closeRoteiro() {
+  document.getElementById('roteiro-overlay').classList.remove('show');
+  document.body.style.overflow = '';
+  stopSlideshow();
+  slideIndex = 0;
+  document.querySelectorAll('.rh-slide').forEach(function(s, i) {
+    s.style.opacity = i === 0 ? '1' : '0';
+  });
+}
+
+// Slideshow automático do hero do roteiro
+var slideIndex = 0;
+var slideTimer = null;
+function startSlideshow() {
+  var slides = document.querySelectorAll('.rh-slide');
+  if (slides.length <= 1) return;
+  slideTimer = setInterval(function() {
+    slides[slideIndex].style.opacity = '0';
+    slideIndex = (slideIndex + 1) % slides.length;
+    slides[slideIndex].style.opacity = '1';
+  }, 3500);
+}
+function stopSlideshow() {
+  if (slideTimer) { clearInterval(slideTimer); slideTimer = null; }
+}
+function toggleLikeFilme() {
+  filmeLiked = !filmeLiked;
+  var btn = document.getElementById('btn-like-filme');
+  if (btn) { if (filmeLiked) btn.classList.add('liked'); else btn.classList.remove('liked'); }
+}
+
+// ════════════════════════════════════════════
+// MODAL DESBLOQUEIO
+// ════════════════════════════════════════════
+function showUnlockModal() {
+  var overlay = document.getElementById('unlock-modal-overlay');
+  overlay.classList.add('show');
+  createSparkles();
+  document.body.style.overflow = 'hidden';
+}
+function closeUnlockModal() {
+  document.getElementById('unlock-modal-overlay').classList.remove('show');
+  document.body.style.overflow = '';
+  var main = document.getElementById('screen-main');
+  if (main) main.scrollTo({ top: 0, behavior: 'smooth' });
+  setTimeout(function() { openFilmeModal(); }, 600);
+}
+function createSparkles() {
+  var container = document.getElementById('unlock-sparkles');
+  if (!container) return;
+  container.innerHTML = '';
+  var sparkColors = ['#E50914','#ff6b8a','#fff','#ffcc00','#46d369'];
+  for (var i = 0; i < 40; i++) {
+    var s = document.createElement('div');
+    s.className = 'sparkle';
+    var size = Math.random() * 8 + 3;
+    var tx = (Math.random() - 0.5) * 400;
+    var ty = (Math.random() - 0.5) * 400;
+    s.style.cssText = 'width:' + size + 'px;height:' + size + 'px;' +
+      'left:50%;top:50%;' +
+      'background:' + sparkColors[Math.floor(Math.random() * sparkColors.length)] + ';' +
+      '--tx:' + tx + 'px;--ty:' + ty + 'px;' +
+      'animation-delay:' + (Math.random() * 0.5) + 's';
+    container.appendChild(s);
+  }
+}
+
+function closeModal() {
+  document.getElementById('modal-overlay').classList.remove('show');
+  document.body.style.overflow = '';
+}
+function closeModalOutside(e) { if(e.target===document.getElementById('modal-overlay')) closeModal(); }
+
+// ════════════════════════════════════════════
+// NAVEGAÇÃO
+// ════════════════════════════════════════════
+function enterProfile() {
+  document.getElementById('screen-profiles').classList.add('hide');
+  setTimeout(function() {
+    document.getElementById('screen-main').classList.add('show');
+    observeRows();
+    playTudum();
+    showToast('💕 Bem-vinda, meu amor');
+    // Mostrar barra de progresso
+    var wrap = document.getElementById('progress-bar-wrap');
+    if (wrap) wrap.style.display = 'block';
+    updateProgress();
+    // Botão começa bloqueado
+    var btn = document.getElementById('btn-assistir');
+    if (btn) btn.classList.add('locked');
+  }, 500);
+}
+
+function backToProfiles() {
+  document.getElementById('screen-main').classList.remove('show');
+  setTimeout(() => document.getElementById('screen-profiles').classList.remove('hide'), 300);
+}
+
+// ════════════════════════════════════════════
+// SCROLL REVEAL ROWS
+// ════════════════════════════════════════════
+function observeRows() {
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if(e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); }});
+  }, { threshold: 0.15 });
+  document.querySelectorAll('.row').forEach((r,i) => {
+    r.style.transitionDelay = `${i * 0.1}s`;
+    observer.observe(r);
+  });
+}
+
+// ════════════════════════════════════════════
+// TOAST
+// ════════════════════════════════════════════
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// ════════════════════════════════════════════
+// CURSOR
+// ════════════════════════════════════════════
+function setupCursor() {
+  const c = document.getElementById('cursor');
+  document.addEventListener('mousemove', e => { c.style.left=e.clientX+'px'; c.style.top=e.clientY+'px'; });
+  document.addEventListener('mousedown', () => c.classList.add('click'));
+  document.addEventListener('mouseup', () => c.classList.remove('click'));
+  document.querySelectorAll('button,a,.card,.profile-card,.nav-link').forEach(el => {
+    el.addEventListener('mouseenter', () => c.classList.add('hover'));
+    el.addEventListener('mouseleave', () => c.classList.remove('hover'));
+  });
+}
+
+// ════════════════════════════════════════════
+// NAVBAR SCROLL
+// ════════════════════════════════════════════
+function setupScroll() {
+  document.getElementById('screen-main').addEventListener('scroll', function() {
+    document.getElementById('navbar').classList.toggle('scrolled', this.scrollTop > 60);
+  });
+}
+
+// ════════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════════
+window.addEventListener('load', () => {
+  createParticles();
+  countTotalCards();
+  renderAll();
+  setupCursor();
+  setupScroll();
+  // Mostrar barra de progresso após enter
+  setTimeout(() => {
+    document.getElementById('loading').classList.add('hide');
+    setTimeout(() => document.getElementById('loading').remove(), 900);
+  }, 2400);
+});
+
+
+// ════════════════════════════════════════════
+// TUDUM + ÁUDIO
+// ════════════════════════════════════════════
+var tudumPlayed = false;
+var bgMusicStarted = false;
+
+// ── TUDUM ──────────────────────────────────
+function playTudum() {
+  if (tudumPlayed) return;
+  tudumPlayed = true;
+  var ctx = new (window.AudioContext || window.webkitAudioContext)();
+
+  function playNote(freq, start, duration, vol, type) {
+    var osc = ctx.createOscillator();
+    var gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.type = type || 'sine';
+    osc.frequency.setValueAtTime(freq, ctx.currentTime + start);
+    gain.gain.setValueAtTime(0, ctx.currentTime + start);
+    gain.gain.linearRampToValueAtTime(vol, ctx.currentTime + start + 0.01);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + start + duration);
+    osc.start(ctx.currentTime + start);
+    osc.stop(ctx.currentTime + start + duration + 0.05);
+  }
+
+  // Ta-dum clássico
+  playNote(220,  0.0,  0.25, 0.5, 'sine');   // TA grave
+  playNote(110,  0.0,  0.30, 0.3, 'triangle');
+  playNote(330,  0.22, 0.55, 0.7, 'sine');   // DUM
+  playNote(165,  0.22, 0.60, 0.4, 'triangle');
+  playNote(440,  0.22, 0.55, 0.25, 'sine');
+  // Reverb simulado
+  playNote(330,  0.35, 0.80, 0.15, 'sine');
+  playNote(220,  0.40, 0.70, 0.10, 'sine');
+}
+
+// ── SPOTIFY WIDGET ─────────────────────────
+// Substitua PLAYLIST_ID pelo ID da sua playlist do Spotify
+// Ex: se a URL for open.spotify.com/playlist/37i9dQZF1DX... → o ID é 37i9dQZF1DX...
+var SPOTIFY_PLAYLIST_ID = 'COLOQUE_O_ID_AQUI';
+var spotifyVisible = false;
+
+function createSpotifyWidget() {
+  if (!SPOTIFY_PLAYLIST_ID || SPOTIFY_PLAYLIST_ID === 'COLOQUE_O_ID_AQUI') return;
+  var wrap = document.createElement('div');
+  wrap.id = 'spotify-widget';
+  wrap.style.cssText = [
+    'position:fixed',
+    'bottom:20px',
+    'right:20px',
+    'z-index:500',
+    'border-radius:12px',
+    'overflow:hidden',
+    'box-shadow:0 8px 32px rgba(0,0,0,.6)',
+    'opacity:0',
+    'transform:translateY(20px)',
+    'transition:opacity .4s ease,transform .4s ease',
+    'pointer-events:none'
+  ].join(';');
+
+  var iframe = document.createElement('iframe');
+  iframe.id = 'spotify-iframe';
+  iframe.style.cssText = 'border:none;border-radius:12px;display:block';
+  iframe.width = '280';
+  iframe.height = '80';
+  iframe.allow = 'autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture';
+  iframe.loading = 'lazy';
+  iframe.src = 'https://open.spotify.com/embed/playlist/' + SPOTIFY_PLAYLIST_ID + '?utm_source=generator&theme=0';
+
+  // Botão minimizar
+  var toggleBtn = document.createElement('button');
+  toggleBtn.id = 'spotify-toggle';
+  toggleBtn.innerHTML = '&#9654;';
+  toggleBtn.title = 'Música';
+  toggleBtn.style.cssText = [
+    'position:fixed',
+    'bottom:20px',
+    'right:20px',
+    'z-index:501',
+    'width:44px',
+    'height:44px',
+    'border-radius:50%',
+    'background:#1DB954',
+    'border:none',
+    'color:#fff',
+    'font-size:18px',
+    'cursor:pointer',
+    'box-shadow:0 4px 16px rgba(29,185,84,.4)',
+    'transition:all .2s',
+    'display:flex',
+    'align-items:center',
+    'justify-content:center'
+  ].join(';');
+  toggleBtn.onmouseenter = function() { this.style.transform = 'scale(1.1)'; };
+  toggleBtn.onmouseleave = function() { this.style.transform = 'scale(1)'; };
+  toggleBtn.onclick = function() { toggleSpotify(); };
+
+  wrap.appendChild(iframe);
+  document.body.appendChild(wrap);
+  document.body.appendChild(toggleBtn);
+}
+
+function toggleSpotify() {
+  var wrap = document.getElementById('spotify-wrap');
+  var btn = document.getElementById('spotify-btn');
+  if (!wrap) return;
+  var isOpen = wrap.classList.contains('open');
+  if (isOpen) {
+    wrap.classList.remove('open');
+    if (btn) btn.textContent = '🎵';
+  } else {
+    wrap.classList.add('open');
+    if (btn) btn.textContent = '✕';
+  }
+}
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    if (document.getElementById('video-overlay').classList.contains('show')) { closeVideo(); return; }
+    if (document.getElementById('unlock-modal-overlay').classList.contains('show')) { closeUnlockModal(); return; }
+    if (document.getElementById('filme-modal-overlay').classList.contains('show')) { closeFilmeModal(); return; }
+    if (document.getElementById('modal-overlay').classList.contains('show')) { closeModal(); return; }
+  }
+  // G ou OK/Enter no controle = Gostei
+  if ((e.key === 'g' || e.key === 'G') && document.getElementById('modal-overlay').classList.contains('show')) {
+    handleCardLike();
+  }
+});
+</script>
+
+
+
+
+<!-- PÁGINA ROTEIRO DA VIAGEM -->
+<div id="roteiro-overlay">
+  <div id="roteiro-page">
+    
+    <!-- HEADER -->
+    <div class="roteiro-header">
+      <button class="roteiro-back" onclick="closeRoteiro()">← Voltar</button>
+      <div class="roteiro-logo">NOSSAFLIX</div>
+    </div>
+
+    <!-- HERO DA VIAGEM -->
+    <div class="roteiro-hero">
+      <div class="roteiro-hero-bg">
+        <!-- Fotos do chalé vão aqui — adicione src="Fotos/chale1.jpg" etc -->
+        <div class="roteiro-hero-slideshow" id="roteiro-slideshow">
+          <img class="rh-slide active" src="Fotos/chale3.jpg" alt="Exterior do chalé" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0;opacity:1;transition:opacity 1s ease">
+          <img class="rh-slide" src="Fotos/chale1.jpg" alt="Hidromassagem" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0;opacity:0;transition:opacity 1s ease">
+          <img class="rh-slide" src="Fotos/chale2.jpg" alt="Vista com arco-íris" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0;opacity:0;transition:opacity 1s ease">
+        </div>
+      </div>
+      <div class="roteiro-hero-gradient"></div>
+      <div class="roteiro-hero-content">
+        <div class="roteiro-badge">🌟 NOSSA PRIMEIRA VIAGEM DE ANIVERSÁRIO</div>
+        <h1 class="roteiro-title">Campos do Jordão</h1>
+        <p class="roteiro-subtitle">Serra da Mantiqueira · São Paulo · 26 a 28 de junho de 2026</p>
+        <div class="roteiro-stats">
+          <div class="rstat"><span class="rstat-n">3</span><span class="rstat-l">dias</span></div>
+          <div class="rstat-div"></div>
+          <div class="rstat"><span class="rstat-n">2</span><span class="rstat-l">noites</span></div>
+          <div class="rstat-div"></div>
+          <div class="rstat"><span class="rstat-n">1800m</span><span class="rstat-l">altitude</span></div>
+          <div class="rstat-div"></div>
+          <div class="rstat"><span class="rstat-n">∞</span><span class="rstat-l">amor</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CONTEÚDO -->
+    <div class="roteiro-content">
+
+      <!-- PASSAGENS -->
+      <div class="roteiro-section">
+        <h2 class="roteiro-section-title">🚌 Passagens</h2>
+        <div class="roteiro-cards-grid">
+          <div class="rcard rcard-blue">
+            <div class="rcard-icon">🟢</div>
+            <div class="rcard-body">
+              <div class="rcard-tag">IDA</div>
+              <div class="rcard-title">São Paulo → Campos do Jordão</div>
+              <div class="rcard-info"><span>📍</span> Terminal Tietê, São Paulo</div>
+              <div class="rcard-info"><span>🕗</span> Saída: <strong>08:00h</strong> · Dia 26/06/2026</div>
+              <div class="rcard-info"><span>⏱</span> Duração aprox.: 3h30</div>
+              <div class="rcard-info"><span>🏔️</span> Chegada: ~11:30h em Campos do Jordão</div>
+            </div>
+          </div>
+          <div class="rcard rcard-pink">
+            <div class="rcard-icon">🔴</div>
+            <div class="rcard-body">
+              <div class="rcard-tag">VOLTA</div>
+              <div class="rcard-title">Campos do Jordão → São Paulo</div>
+              <div class="rcard-info"><span>📍</span> Terminal Urbano, Campos do Jordão</div>
+              <div class="rcard-info"><span>🕓</span> Saída: <strong>16:30h</strong> · Dia 28/06/2026</div>
+              <div class="rcard-info"><span>⏱</span> Duração aprox.: 3h30</div>
+              <div class="rcard-info"><span>🏠</span> Chegada: ~20:00h em São Paulo</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- HOSPEDAGEM -->
+      <div class="roteiro-section">
+        <h2 class="roteiro-section-title">🏡 Nossa Hospedagem</h2>
+        <div class="rcard rcard-verde" style="max-width:700px">
+          <div class="rcard-body">
+            <div class="rcard-tag">CHALÉ COM HIDRO</div>
+            <div class="rcard-title">Airbnb · Campos do Jordão</div>
+            <div class="rcard-info"><span>📍</span> Rua Maria Rita Moreira da Silva, 245 · Campos do Jordão, SP</div>
+            <div class="rcard-info"><span>📅</span> Check-in: <strong>Sex 26/06 às 15:00h</strong></div>
+            <div class="rcard-info"><span>📅</span> Checkout: <strong>Dom 28/06 às 12:00h</strong></div>
+            <div class="rcard-info"><span>✅</span> Confirmação: HMEC9PPXSD</div>
+            <div class="rcard-amenities">
+              <span class="amenity">♨️ Hidromassagem com cromoterapia</span>
+              <span class="amenity">🌈 Vista panorâmica</span>
+              <span class="amenity">🏡 Terraço exclusivo</span>
+              <span class="amenity">🌿 Brisa da montanha</span>
+            </div>
+            <a href="https://www.google.com/maps/search/?api=1&query=-22.7287734,-45.5968599" 
+               target="_blank" class="rcard-map-btn">📍 Ver no Mapa</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- ROTEIRO DIA A DIA -->
+      <div class="roteiro-section">
+        <h2 class="roteiro-section-title">🗓️ Roteiro Dia a Dia</h2>
+        
+        <!-- DIA 1 -->
+        <div class="rdia">
+          <div class="rdia-header rdia-blue">
+            <span class="rdia-num">Dia 1</span>
+            <span class="rdia-data">Quinta, 26 de junho</span>
+            <span class="rdia-tema">Chegada e primeira noite</span>
+          </div>
+          <div class="rdia-body">
+            <div class="rhorario">
+              <div class="rh-time">08:00</div>
+              <div class="rh-dot"></div>
+              <div class="rh-text"><strong>Saída de São Paulo</strong> — Terminal Tietê. Café da manhã antes de embarcar!</div>
+            </div>
+            <div class="rhorario">
+              <div class="rh-time">~11:30</div>
+              <div class="rh-dot"></div>
+              <div class="rh-text"><strong>Chegada em Campos do Jordão</strong> — explorar a cidade, almoço leve pela cidade.</div>
+            </div>
+            <div class="rhorario">
+              <div class="rh-time">15:00</div>
+              <div class="rh-dot"></div>
+              <div class="rh-text"><strong>Check-in no chalé</strong> — explorar o espaço, relaxar, curtir a Hidro.</div>
+            </div>
+            <div class="rhorario">
+              <div class="rh-time">Noite</div>
+              <div class="rh-dot rh-last"></div>
+              <div class="rh-text"><strong>Noite no chalé</strong> — hidromassagem, jantar simples. Primeira noite na montanha. 🌙</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- DIA 2 -->
+        <div class="rdia">
+          <div class="rdia-header rdia-pink">
+            <span class="rdia-num">Dia 2</span>
+            <span class="rdia-data">Sexta, 27 de junho</span>
+            <span class="rdia-tema">O dia perfeito</span>
+          </div>
+          <div class="rdia-body">
+            <div class="rhorario">
+              <div class="rh-time">Manhã</div>
+              <div class="rh-dot"></div>
+              <div class="rh-text">
+                <strong>Teleférico do Parque Capivari</strong> — vista panorâmica da Serra da Mantiqueira a 1.800m de altitude. Imperdível!
+                <div class="rh-preco">💰 R$ 70/pessoa · Parque Capivari · 10h às 19h30</div>
+              </div>
+            </div>
+            <div class="rhorario">
+              <div class="rh-time">Tarde</div>
+              <div class="rh-dot"></div>
+              <div class="rh-text">
+                <strong>Vila Capivari</strong> — passeio a pé pela rua mais charmosa da cidade. Lojas de chocolate, artesanato, cafés. Entrada gratuita!
+                <div class="rh-preco">✅ Gratuito · Ótimo para fotos e comprinhas</div>
+              </div>
+            </div>
+            <div class="rhorario">
+              <div class="rh-time">~16h</div>
+              <div class="rh-dot"></div>
+              <div class="rh-text">
+                <strong>Ducha de Prata</strong> — parque com quedas d'água, plataformas de madeira e trilha leve.
+                <div class="rh-preco">✅ Gratuito</div>
+              </div>
+            </div>
+            <div class="rhorario">
+              <div class="rh-time">Noite</div>
+              <div class="rh-dot rh-last"></div>
+              <div class="rh-text"><strong>Jantar especial</strong> — restaurante na cidade ou preparado no chalé. Noite na hidro. ♨️</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- DIA 3 -->
+        <div class="rdia">
+          <div class="rdia-header rdia-gold">
+            <span class="rdia-num">Dia 3 ❤️</span>
+            <span class="rdia-data">Sábado, 28 de junho</span>
+            <span class="rdia-tema">ANIVERSÁRIO DE CASAMENTO</span>
+          </div>
+          <div class="rdia-body">
+            <div class="rhorario">
+              <div class="rh-time">Manhã</div>
+              <div class="rh-dot"></div>
+              <div class="rh-text"><strong>Café da manhã especial no chalé</strong> — sem pressa. Última manhã na montanha.</div>
+            </div>
+            <div class="rhorario">
+              <div class="rh-time">12:00</div>
+              <div class="rh-dot"></div>
+              <div class="rh-text"><strong>Checkout</strong> — deixar as malas e aproveitar a cidade até a hora de partir.</div>
+            </div>
+            <div class="rhorario">
+              <div class="rh-time">Tarde</div>
+              <div class="rh-dot"></div>
+              <div class="rh-text">
+                <strong>Parque Amantikir</strong> (opcional) — jardim botânico com flores e natureza, perfeito para fotos de aniversário.
+                <div class="rh-preco">💰 ~R$ 45/pessoa · Funciona até 18h</div>
+              </div>
+            </div>
+            <div class="rhorario">
+              <div class="rh-time">16:30</div>
+              <div class="rh-dot rh-last"></div>
+              <div class="rh-text"><strong>Retorno para São Paulo</strong> — Terminal Urbano. Com muitas memórias na bagagem. 🥰</div>
+            </div>
+            <div class="rdia-gratuito" style="background:rgba(212,83,126,.12);border-color:rgba(212,83,126,.3);color:#ff6b8a">
+              ❤️ 28 de junho de 2026 — 1 ano de casados. O começo de muitos outros.
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+
+      <!-- MENSAGEM FINAL -->
+      <div class="roteiro-final">
+        <div class="roteiro-final-heart">❤️</div>
+        <p>Preparei cada detalhe dessa viagem pensando em você.<br>
+        Você merece cada momento, cada vista e cada memória que vamos construir juntos.</p>
+        <p style="margin-top:12px;color:#ff6b8a;font-style:italic">Feliz 1 Ano, minha Pretinha. 🌹</p>
+      </div>
+
+    </div><!-- fim roteiro-content -->
+  </div><!-- fim roteiro-page -->
+</div><!-- fim roteiro-overlay -->
+
+</body>
+</html>
