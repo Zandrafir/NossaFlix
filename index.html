@@ -35,7 +35,7 @@ html,body{width:100%;height:100%;background:var(--bg);color:var(--text);font-fam
 @keyframes particleFade{0%{opacity:0;transform:translateY(0) scale(0)}20%{opacity:.6}80%{opacity:.3}100%{opacity:0;transform:translateY(-100vh) scale(1.5)}}
 
 /* PERFIS */
-#screen-profiles{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:48px;z-index:100;opacity:0;animation:fadeInUp .8s 2.4s ease forwards}
+#screen-profiles{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:48px;z-index:100;opacity:0;transition:opacity .8s ease}
 @keyframes fadeInUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
 #screen-profiles.hide{animation:profileOut .5s ease forwards;pointer-events:none}
 @keyframes profileOut{to{opacity:0;transform:scale(1.06)}}
@@ -134,6 +134,56 @@ html,body{width:100%;height:100%;background:var(--bg);color:var(--text);font-fam
 .card-placeholder::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent 0%,rgba(255,255,255,.04) 50%,transparent 100%);animation:shimmer 2s infinite}
 @keyframes shimmer{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
 
+/* CARD DE VÍDEO */
+.card-video-thumb{width:100%;height:100%;position:relative;overflow:hidden;background:#000}
+.card-video-thumb video{width:100%;height:100%;object-fit:cover;object-position:center top;display:block;transition:transform .4s ease}
+.card:hover .card-video-thumb video{transform:scale(1.06)}
+.card-video-play-icon{
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  background:rgba(0,0,0,.35);
+  font-size:36px;color:#fff;
+  transition:background .25s,opacity .25s;
+  pointer-events:none;
+}
+.card:hover .card-video-play-icon{background:rgba(0,0,0,.15)}
+
+/* PLAYER CARD VIDEO OVERLAY */
+#card-video-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,.96);z-index:450;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  opacity:0;pointer-events:none;transition:opacity .4s;
+  backdrop-filter:blur(10px);padding:20px;
+}
+#card-video-overlay.show{opacity:1;pointer-events:all}
+.card-video-wrap{
+  position:relative;width:min(90vw,900px);
+  display:flex;flex-direction:column;gap:16px;
+}
+.card-video-player-box{
+  position:relative;width:100%;aspect-ratio:9/16;max-height:70vh;
+  background:#000;border-radius:12px;overflow:hidden;
+  box-shadow:0 30px 80px rgba(0,0,0,.9);
+}
+.card-video-player-box video{width:100%;height:100%;object-fit:contain;display:block}
+.card-video-close{
+  position:absolute;top:12px;right:12px;z-index:10;
+  width:36px;height:36px;border-radius:50%;
+  background:rgba(0,0,0,.7);border:none;color:#fff;
+  font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;
+  transition:all .2s;backdrop-filter:blur(4px);
+}
+.card-video-close:hover{background:var(--red);transform:scale(1.1)}
+.card-video-info{text-align:center}
+#card-video-title{
+  font-family:'Bebas Neue',sans-serif;font-size:28px;
+  letter-spacing:2px;color:#fff;margin-bottom:6px;
+}
+#card-video-desc{
+  font-family:'Crimson Pro',serif;font-size:15px;
+  color:rgba(255,255,255,.65);line-height:1.6;
+  max-width:600px;margin:0 auto;
+}
+
 /* MODAL */
 #modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:200;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s;padding:20px;backdrop-filter:blur(6px)}
 #modal-overlay.show{opacity:1;pointer-events:all}
@@ -160,7 +210,7 @@ html,body{width:100%;height:100%;background:var(--bg);color:var(--text);font-fam
 #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
 /* LOADING */
-#loading{position:fixed;inset:0;background:#000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;z-index:999;transition:opacity .8s}
+#loading{position:fixed;inset:0;background:#000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;z-index:999;transition:opacity .8s;opacity:0;pointer-events:none}
 #loading.hide{opacity:0;pointer-events:none}
 .loading-logo{font-family:'Bebas Neue',sans-serif;font-size:64px;letter-spacing:8px;color:var(--red);animation:flicker 1.5s ease-in-out infinite;text-shadow:0 0 40px rgba(229,9,20,.6)}
 @keyframes flicker{0%,100%{opacity:1;text-shadow:0 0 40px rgba(229,9,20,.6)}50%{opacity:.7;text-shadow:0 0 80px rgba(229,9,20,1)}}
@@ -322,6 +372,161 @@ html,body{width:100%;height:100%;background:var(--bg);color:var(--text);font-fam
 
 <div class="cursor" id="cursor"></div>
 <div id="particles"></div>
+
+
+<!-- ══════════════════════════════
+     TELA DA CHAVE — ENTRADA
+══════════════════════════════ -->
+<div id="key-screen">
+  <div id="key-particles"></div>
+  <div id="key-content">
+    <div id="key-title">NOSSAFLIX</div>
+    <div id="key-subtitle">Uma história preparada especialmente para você</div>
+    <div id="key-wrap" onclick="unlockSite()">
+      <svg id="key-svg" viewBox="0 0 120 200" xmlns="http://www.w3.org/2000/svg">
+        <!-- Haste da chave -->
+        <rect x="52" y="90" width="16" height="80" rx="6" fill="#C9A84C"/>
+        <!-- Dentes da chave -->
+        <rect x="68" y="130" width="14" height="10" rx="3" fill="#C9A84C"/>
+        <rect x="68" y="152" width="10" height="10" rx="3" fill="#C9A84C"/>
+        <!-- Anel da chave — coração -->
+        <path id="key-heart"
+          d="M60 82 C60 82 38 62 38 46 C38 34 47 26 56 28 C58 28.5 59.2 29.2 60 30 C60.8 29.2 62 28.5 64 28 C73 26 82 34 82 46 C82 62 60 82 60 82 Z"
+          fill="#E50914" stroke="#C9A84C" stroke-width="2"/>
+        <!-- Brilho no coração -->
+        <ellipse cx="50" cy="38" rx="5" ry="3.5" fill="rgba(255,255,255,.25)" transform="rotate(-30 50 38)"/>
+        <!-- Buraco da chave no coração -->
+        <circle cx="60" cy="50" r="6" fill="rgba(0,0,0,.35)"/>
+        <rect x="58" y="50" width="4" height="8" rx="1" fill="rgba(0,0,0,.35)"/>
+      </svg>
+      <div id="key-hint">Clique para abrir</div>
+    </div>
+    <div id="key-tagline">Para minha Pretinha 🌹</div>
+  </div>
+</div>
+
+<style>
+/* ══ TELA DA CHAVE ══ */
+#key-screen {
+  position: fixed; inset: 0; z-index: 2000;
+  background: #000;
+  display: flex; align-items: center; justify-content: center;
+  transition: opacity .8s ease, transform .8s ease;
+}
+#key-screen.unlock {
+  opacity: 0; transform: scale(1.06); pointer-events: none;
+}
+
+#key-particles {
+  position: absolute; inset: 0; pointer-events: none; overflow: hidden;
+}
+.kp {
+  position: absolute; border-radius: 50%;
+  animation: kpFade linear infinite;
+}
+@keyframes kpFade {
+  0%   { opacity: 0; transform: translateY(0) scale(0); }
+  20%  { opacity: .5; }
+  80%  { opacity: .2; }
+  100% { opacity: 0; transform: translateY(-100vh) scale(1.5); }
+}
+
+#key-content {
+  display: flex; flex-direction: column; align-items: center; gap: 18px;
+  text-align: center;
+}
+
+#key-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 56px; letter-spacing: 8px;
+  color: #E50914;
+  text-shadow: 0 0 40px rgba(229,9,20,.7), 0 0 80px rgba(229,9,20,.3);
+  animation: titleGlow 2s ease-in-out infinite alternate;
+}
+@keyframes titleGlow {
+  from { text-shadow: 0 0 30px rgba(229,9,20,.6), 0 0 60px rgba(229,9,20,.2); }
+  to   { text-shadow: 0 0 60px rgba(229,9,20,.9), 0 0 120px rgba(229,9,20,.4); }
+}
+
+#key-subtitle {
+  font-family: 'Crimson Pro', serif;
+  font-size: 16px; letter-spacing: 2px;
+  color: rgba(255,255,255,.5);
+  font-style: italic;
+  margin-top: -8px;
+}
+
+#key-wrap {
+  cursor: pointer;
+  position: relative;
+  width: 140px; height: 240px;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: flex-start;
+  transition: transform .2s;
+  margin: 10px 0;
+}
+#key-wrap:hover { transform: scale(1.06) translateY(-4px); }
+#key-wrap:hover #key-hint { opacity: 1; }
+#key-wrap:active { transform: scale(.97); }
+
+#key-svg {
+  width: 120px; height: 200px;
+  filter: drop-shadow(0 0 18px rgba(229,9,20,.5)) drop-shadow(0 0 8px rgba(201,168,76,.4));
+  animation: keySway 3s ease-in-out infinite;
+  transform-origin: 60px 50px;
+}
+@keyframes keySway {
+  0%,100% { transform: rotate(-4deg); }
+  50%      { transform: rotate(4deg); }
+}
+
+#key-hint {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px; letter-spacing: 3px;
+  color: rgba(255,255,255,.4);
+  text-transform: uppercase;
+  margin-top: 8px;
+  opacity: .6;
+  transition: opacity .3s;
+  animation: hintBlink 2s ease-in-out infinite;
+}
+@keyframes hintBlink {
+  0%,100% { opacity: .4; }
+  50%      { opacity: .8; }
+}
+
+#key-tagline {
+  font-family: 'Crimson Pro', serif;
+  font-size: 20px; color: rgba(255,255,255,.7);
+  font-style: italic; letter-spacing: 1px;
+  margin-top: 4px;
+}
+
+/* Animação ao clicar — chave gira e brilha */
+#key-svg.clicked {
+  animation: keyUnlock .7s cubic-bezier(.34,1.56,.64,1) forwards;
+  filter: drop-shadow(0 0 40px rgba(201,168,76,1)) drop-shadow(0 0 80px rgba(229,9,20,.8));
+}
+@keyframes keyUnlock {
+  0%   { transform: rotate(0deg) scale(1); }
+  40%  { transform: rotate(180deg) scale(1.2); }
+  70%  { transform: rotate(340deg) scale(1.1); }
+  100% { transform: rotate(360deg) scale(1.3); opacity: 0; }
+}
+
+/* Partículas de desbloqueio */
+.ku-particle {
+  position: fixed;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 2001;
+  animation: kuFly .8s ease forwards;
+}
+@keyframes kuFly {
+  0%   { opacity: 1; transform: translate(0,0) scale(1); }
+  100% { opacity: 0; transform: translate(var(--tx),var(--ty)) scale(0); }
+}
+</style>
 
 <!-- LOADING -->
 <div id="loading">
@@ -492,7 +697,7 @@ html,body{width:100%;height:100%;background:var(--bg);color:var(--text);font-fam
     <button class="video-close" onclick="closeVideo()">&#x2715;</button>
     <video id="main-video" controls playsinline preload="metadata"
       style="width:100%;height:100%;background:#000;outline:none">
-      <source src="exemplo.mp4" type="video/mp4">
+      <source src="Final.mp4" type="video/mp4">
       Seu navegador nao suporta video HTML5.
     </video>
   </div>
@@ -520,30 +725,30 @@ html,body{width:100%;height:100%;background:var(--bg);color:var(--text);font-fam
 // ════════════════════════════════════════════
 const data = {
   nosso: [
-    { img:"Fotos/nos1.jpg", emoji:"💑", title:"Os Melhores 11 Meses", duration:"11 meses · e muitos anos por vir", desc:"Uma história real de amor, cumplicidade e crescimento. Protagonizada por duas pessoas que escolheram um ao outro — e continuam escolhendo todo dia. Escreva aqui a sinopse desse momento especial." },
-    { img:"Fotos/nos2.jpg", emoji:"🌸", title:"Entre Flores", duration:"2018 · Um passeio inesquecível", desc:"Escreva sobre esse passeio no parque. O que vocês estavam sentindo, o que falaram, o que ficou guardado." },
-    { img:"Fotos/nos3.jpg", emoji:"🎈", title:"Noite de Surpresa", duration:"2018 · Quando tudo ficou rosa", desc:"Aquela noite que você decorou com balões e fotos na parede. Escreva o que ela disse quando entrou no quarto." },
-    { img:"Fotos/nos4.jpg", emoji:"😜", title:"Nós Sendo Nós", duration:"Pra sempre · Sem filtro", desc:"Aquele jeito que a gente tem de ser completamente ridículo junto — e amar isso." },
-    { img:"Fotos/nos5.jpg", emoji:"🍽️", title:"Nossa Mesa", duration:"Cada encontro · Cada jantar", desc:"Sobre os jantares juntos, as risadas à mesa, e como cada refeição compartilhada virou uma memória." },
+    { img:"Fotos/nos1.jpg", emoji:"💑", title:"Os Melhores 11 Meses", duration:"11 meses · e muitos anos por vir", desc:"Uma história real de amor, cumplicidade e crescimento. Protagonizada por duas pessoas que escolheram um ao outro e continuam escolhendo todo dia. Durante os 11 Meses nós caímos e levantamos, brigamos e nos entendemos, discordamos e concordamos, mas o mais importante ainda Erramos e Aprendemos. Dividir uma vida, uma casa, uma rotina é difícil, estressante, desafiador, mas também é gratificante e lindo, a forma como a gente se entende, busca o melhor um para o outro, está disposto a mudar coisas da rotina e da vida para poder encaixar o que é bom para o outro é o que nos torna unidos! Obrigado por sempre pensar no que é bom para nós dois, buscando sempre cuidar de mim, me ajudar, me fornecer uma casa confortável e uma vida cheia de amor." },
+    { img:"Fotos/nos2.jpg", emoji:"🌸", title:"Entre Flores", duration:"2018 · A beleza na simplicidade.", desc:"AS flores são algo que frequentemente está na nossa rotina, ela nos mostra a beleza das coisas simples e naturais, da paz, calma, tranquilidade e serenidade. Quando possível gosto de passar numa loja, comprar umas flores e levar para você, e gosto mais ainda de ver a sua reação, derrete meu coração." },
+    { img:"Fotos/nos3.jpg", emoji:"🎈", title:"Noites Juntos", duration:"2018 · Quando tudo ficou rosa", desc:"Uma das primeiras noites que saímos juntos, nosso primeiro Natal, gostei muito desse dia, marcando o primeiro de muitos outros finais de ano juntos." },
+    { img:"Fotos/nos4.jpg", emoji:"😜", title:"Nós Sendo Nós", duration:"Pra sempre · Sem filtro", desc:"Acho que algo que nós temos muito em comum é a vontade de fazer algo pelo outro, um presente, uma comida, uma lembrancinha, algo que nos faça bem e a gente sabe que o outro vai se sentir bem também, sempre pensando em como agradar, como cuidar, estar presente, estar disponível para o outro, isso torna nossa relação uma parceria e uma união que cada dia se fortalece e me faz te amar mais e mais." },
+    { img:"Fotos/nos5.jpg", emoji:"🍽️", title:"Nossa Mesa", duration:"Cada encontro · Cada jantar", desc:"Aqui é o nosso ponto forte, COMER! Sempre estamos dispostos a fazer uma boquinha em algum lugar, em casa, restaurante, casa dos outros, pedindo algo... sempre querendo algo gostoso para comer, fora que você tem o dom culinário que todo gordinho poderia querer! Isso é algo que você usa para me conquistar sem nem saber, inclusive o que será que vamos comer hoje?" },
   ],
   ela: [
-    { img:"Fotos/ela.jpg", emoji:"🌹", title:"Ela e as Rosas", duration:"Uma vida inteira · A protagonista", desc:"Escreva aqui sobre ela — quem ela é, o que você ama nela, como ela te surpreende todo dia." },
-    { img:"Fotos/ela2.jpg", emoji:"🐰", title:"O Lado Fofo Dela", duration:"Todo dia · De mil formas", desc:"Aquele jeito dela de ser fofa sem querer. Escreva sobre um desses momentos." },
-    { img:"Fotos/ela3.jpg", emoji:"🎉", title:"O Sorriso Dela", duration:"Sempre · O melhor espetáculo", desc:"Sobre o sorriso dela quando é de verdade — do jeito que ilumina o ambiente inteiro." },
-    { img:"Fotos/ela4.jpg", emoji:"💐", title:"Quando Ela é Surpreendida", duration:"Cada vez · Vale sempre", desc:"Sobre como ela reage quando você faz algo especial pra ela." },
+    { img:"Fotos/ela.jpg", emoji:"🌹", title:"Ela e as Rosas", duration:"Uma vida inteira · A protagonista", desc:"As rosas possuem uma conexão especial com você, são delicadas, lindas, apaixonantes, mas também possuem espinhos, sabem se defender, mas sem perder sua beleza. Você é linda, brava, elegante e muito estressada, por isso que eu te amo! Equilibro." },
+    { img:"Fotos/ela2.jpg", emoji:"🐰", title:"O Lado Fofo Dela", duration:"Todo dia · De mil formas", desc:"Esse é o seu lado que mais me encanta, quando você é fofa! Quando faz tudo para ser o seu lado menina, eu fico muito encantado, mexe comeu coração, e o amor que eu sinto por você cresce cada vez mais." },
+    { img:"Fotos/ela3.jpg", emoji:"🎉", title:"O Sorriso Dela", duration:"Sempre · O melhor espetáculo", desc:"Simplesmente a coisa que eu mais amo em você, que ilumina minha alma, e me dá alegria, esse seu sorriso é um dos maiores motivos para eu me apaixonar cada dia mais por você." },
+    { img:"Fotos/ela4.jpg", emoji:"💐", title:"Quando Ela é Surpreendida", duration:"Cada vez · Vale sempre", desc:"Uma das primeiras surpresas que fiz para você, te assustou de inicio, mas que depois você amou, esse dia é inesquecível" },
   ],
   lugares: [
-    { img:"Fotos/lugar1.jpg", emoji:"🍷", title:"São Roque", duration:"2019 · Uma tarde especial", desc:"Aquele passeio em São Roque. Escreva o que foi mais especial nesse dia." },
-    { img:"Fotos/lugar2.jpg", emoji:"🌺", title:"No Interior", duration:"2019 · Natureza e nós dois", desc:"Escreva sobre esse passeio — o que você sentiu estando naquele lugar com ela." },
-    { img:"Fotos/lugar3.jpg", emoji:"🌊", title:"Nossa Praia", duration:"2020 · Areia e sol", desc:"Sobre esse dia no mar. O que vocês fizeram, o que sentiram." },
-    { img:"Fotos/lugar4.jpg", emoji:"🌴", title:"Cidade Grande", duration:"2020 · Explorando juntos", desc:"Sobre explorar a cidade juntos. Escreva sobre o que é diferente quando ela está do seu lado." },
+    { img:"Fotos/lugar1.jpg", emoji:"🍷", title:"São Roque", duration:"2019 · Uma tarde especial", desc:"Aquele passeio em São Roque. Esse passeio foi ótimo, nos tornamos mais próximos, e foram momentos marcantes." },
+    { img:"Fotos/lugar2.jpg", emoji:"🌺", title:"Viagens", duration:"2019 · Natureza e nós dois", desc:"Algo que nós sempre amamos mas poucos fazemos, VIAJAR, preciso fazer mais isso hein" },
+    { img:"Fotos/lugar3.jpg", emoji:"🌊", title:"Nossa Praia", duration:"2020 · Areia e sol", desc:"Seria esse nosso destino favorito? Simplesmente o Mar, Sal, Sol, Porções e PAZ" },
+    { img:"Fotos/lugar4.jpg", emoji:"🌴", title:"Cidade Grande", duration:"2020 · Explorando juntos", desc:"Mesmo na cidade a gente se diverte de alguma forma, sempre há momentos marcantes, importante e inesquecíveis ao seu lado." },
   ],
   especial: [
-    { img:"Fotos/especial1.jpg", emoji:"🎓", title:"A Colação", duration:"2018 · Um dia histórico", desc:"O dia da sua colação de grau — e ela lá, do seu lado. Escreva o que significou ter ela nesse momento." },
-    { img:"Fotos/especial2.jpg", emoji:"🥙", title:"Habib's", duration:"2019 · Os lugares simples", desc:"Sobre como os lugares mais simples viram especiais quando é com ela." },
-    { img:"Fotos/especial3.jpg", emoji:"✨", title:"Nós Dois", duration:"Sempre · A nossa foto", desc:"Escreva o que você pensa quando olha pra essa foto. O que você vê além da imagem." },
-    { img:"Fotos/especial4.jpg", emoji:"☕", title:"Tarde de Semana", duration:"Qualquer dia · Com ela", desc:"Sobre as tardes comuns que viraram especiais só por estarem juntos." },
-    { img:"Fotos/especial5.jpg", emoji:"💝", title:"A Surpresa", duration:"2019 · Quando ela viu", desc:"A reação dela quando viu a surpresa. Escreva o que você sentiu ao ver o rosto dela naquele momento." },
+    { img:"Fotos/especial1.jpg", emoji:"🎓", title:"A Colação", duration:"2018 · Um dia histórico", desc:"O Dia da minha primeira graduação, tanto do meu curso quanto do local onde eu te conheci, estar com você tornou esse dia memorável" },
+    { img:"Fotos/especial2.jpg", emoji:"🥙", title:"Habib's", duration:"2019 · Os lugares simples", desc:"Entre Feijão de Corda e Habibs acho que é aqui que mais fomos juntos, até porque uma esfiha cai bem demais ne?" },
+    { img:"Fotos/especial3.jpg", emoji:"✨", title:"Nós Dois", duration:"Sempre · A nossa foto", desc:"O Par Perfeito? Talvez não para as histórias comuns, mas quem escreveu a nossa foi DEUS e para ele nossa história é mais que perfeita." },
+    { img:"Fotos/especial4.jpg", emoji:"☕", title:"Tarde de Semana", duration:"Qualquer dia · Com ela", desc:"As tardes do dia a dia que passamos juntos sempre são regadas de parceria, seja em casa, na casa de alguem ou até mesmo resolvendo as coisas você sempre está ao meu lado" },
+    { img:"", video:"especial5.mp4", emoji:"💝", title:"A Surpresa", duration:"2019 · Quando ela viu", desc:"Esse Momento é o que me mostrou que eu escolhi a pessoa certa, uma surpresa pequena mas que para nós significou muito" },
   ],
   embreve: [
     { img:"", emoji:"🔮", title:"Em Breve", duration:"Em breve · Aguarde", desc:"Algo especial está a caminho. Volte em breve." },
@@ -590,7 +795,23 @@ function renderRow(id, items, emBreve) {
     card.className = 'card';
     card.tabIndex = 0;
     var breveTag = emBreve ? '<br><small style="font-size:10px;color:#888">EM BREVE</small>' : '';
-    if (item.img) {
+
+    if (item.video) {
+      // Card de vídeo — mostra thumbnail com play grande
+      var videoThumb = document.createElement('div');
+      videoThumb.className = 'card-video-thumb';
+      videoThumb.innerHTML =
+        '<video muted playsinline preload="metadata" style="width:100%;height:100%;object-fit:cover;object-position:center top;display:block">' +
+        '<source src="' + item.video + '#t=0.5" type="video/mp4"></video>' +
+        '<div class="card-video-play-icon">&#9654;</div>';
+      card.appendChild(videoThumb);
+      // Preview ao hover
+      (function(vt) {
+        var vid = vt.querySelector('video');
+        card.addEventListener('mouseenter', function() { if(vid) vid.play().catch(function(){}); });
+        card.addEventListener('mouseleave', function() { if(vid) { vid.pause(); vid.currentTime = 0; } });
+      })(videoThumb);
+    } else if (item.img) {
       var img = document.createElement('img');
       img.src = item.img;
       img.alt = item.title;
@@ -680,7 +901,12 @@ function openModal(ref) {
   document.getElementById('modal-duration').textContent = item.duration;
   document.getElementById('modal-desc').textContent = item.desc;
   var wrap = document.getElementById('modal-img-wrap');
-  if (item.img) {
+  if (item.video) {
+    // Modal de vídeo — abre o player diretamente
+    closeModal();
+    openCardVideo(item.video, item.title, item.desc);
+    return;
+  } else if (item.img) {
     var imgEl = document.createElement('img');
     imgEl.src = item.img;
     imgEl.alt = item.title;
@@ -864,6 +1090,30 @@ function closeModal() {
 function closeModalOutside(e) { if(e.target===document.getElementById('modal-overlay')) closeModal(); }
 
 // ════════════════════════════════════════════
+// PLAYER DE VÍDEO DE CARD
+// ════════════════════════════════════════════
+function openCardVideo(src, title, desc) {
+  var overlay = document.getElementById('card-video-overlay');
+  var vid = document.getElementById('card-video-player');
+  var titleEl = document.getElementById('card-video-title');
+  var descEl = document.getElementById('card-video-desc');
+  if (!overlay || !vid) return;
+  vid.src = src;
+  if (titleEl) titleEl.textContent = title;
+  if (descEl) descEl.textContent = desc;
+  overlay.classList.add('show');
+  document.body.style.overflow = 'hidden';
+  setTimeout(function() { vid.play().catch(function(){}); }, 300);
+}
+function closeCardVideo() {
+  var overlay = document.getElementById('card-video-overlay');
+  var vid = document.getElementById('card-video-player');
+  if (overlay) overlay.classList.remove('show');
+  if (vid) { vid.pause(); vid.src = ''; }
+  document.body.style.overflow = '';
+}
+
+// ════════════════════════════════════════════
 // NAVEGAÇÃO
 // ════════════════════════════════════════════
 function enterProfile() {
@@ -946,11 +1196,7 @@ window.addEventListener('load', () => {
   renderAll();
   setupCursor();
   setupScroll();
-  // Mostrar barra de progresso após enter
-  setTimeout(() => {
-    document.getElementById('loading').classList.add('hide');
-    setTimeout(() => document.getElementById('loading').remove(), 900);
-  }, 2400);
+  // Loading controlado pela chave — não esconder automaticamente
 });
 
 
@@ -1071,8 +1317,88 @@ function toggleSpotify() {
   }
 }
 
+
+// ════════════════════════════════════════════
+// TELA DA CHAVE — ENTRADA
+// ════════════════════════════════════════════
+(function() {
+  // Criar partículas de fundo na tela da chave
+  var kpContainer = document.getElementById('key-particles');
+  if (kpContainer) {
+    for (var i = 0; i < 20; i++) {
+      var p = document.createElement('div');
+      p.className = 'kp';
+      var size = Math.random() * 3 + 1;
+      var x = Math.random() * 100;
+      var dur = Math.random() * 12 + 8;
+      var delay = Math.random() * 8;
+      var cols = ['rgba(229,9,20,.3)','rgba(201,168,76,.3)','rgba(255,107,138,.2)'];
+      var col = cols[Math.floor(Math.random()*cols.length)];
+      p.style.cssText = 'width:'+size+'px;height:'+size+'px;left:'+x+'%;bottom:-10px;background:'+col+';animation-duration:'+dur+'s;animation-delay:'+delay+'s';
+      kpContainer.appendChild(p);
+    }
+  }
+})();
+
+function unlockSite() {
+  var svg = document.getElementById('key-svg');
+  var screen = document.getElementById('key-screen');
+  if (!svg || !screen) return;
+
+  // Animar a chave girando
+  svg.classList.add('clicked');
+
+  // Partículas douradas explodindo
+  var colors = ['#E50914','#C9A84C','#fff','#ff6b8a','#ffcc00'];
+  for (var i = 0; i < 30; i++) {
+    (function() {
+      var p = document.createElement('div');
+      p.className = 'ku-particle';
+      var size = Math.random() * 10 + 4;
+      var tx = (Math.random() - .5) * 500;
+      var ty = (Math.random() - .5) * 500;
+      var col = colors[Math.floor(Math.random()*colors.length)];
+      p.style.cssText = 'width:'+size+'px;height:'+size+'px;' +
+        'left:calc(50% - '+size/2+'px);top:calc(50% - '+size/2+'px);' +
+        'background:'+col+';' +
+        '--tx:'+tx+'px;--ty:'+ty+'px;' +
+        'animation-delay:'+(Math.random()*.2)+'s';
+      document.body.appendChild(p);
+      setTimeout(function() { if (p.parentNode) p.parentNode.removeChild(p); }, 1000);
+    })();
+  }
+
+  // Depois da animação, sumir a tela e iniciar o loading
+  setTimeout(function() {
+    screen.classList.add('unlock');
+    setTimeout(function() {
+      screen.style.display = 'none';
+      // Agora mostra o loading e depois os perfis
+      var loading = document.getElementById('loading');
+      if (loading) {
+        loading.style.opacity = '1';
+        loading.style.pointerEvents = 'all';
+        setTimeout(function() {
+          loading.classList.add('hide');
+          setTimeout(function() {
+            loading.remove();
+            // Mostrar tela de perfis
+            var profiles = document.getElementById('screen-profiles');
+            if (profiles) profiles.style.opacity = '1';
+          }, 900);
+        }, 2400);
+      }
+    }, 900);
+  }, 500);
+}
+
+function closeCardVideoOutside(e) {
+  if (e.target === document.getElementById('card-video-overlay')) closeCardVideo();
+}
+
 document.addEventListener('keydown', function(e) {
   if (e.key === 'Escape') {
+    if (document.getElementById('card-video-overlay').classList.contains('show')) { closeCardVideo(); return; }
     if (document.getElementById('video-overlay').classList.contains('show')) { closeVideo(); return; }
     if (document.getElementById('unlock-modal-overlay').classList.contains('show')) { closeUnlockModal(); return; }
     if (document.getElementById('filme-modal-overlay').classList.contains('show')) { closeFilmeModal(); return; }
@@ -1087,6 +1413,23 @@ document.addEventListener('keydown', function(e) {
 
 
 
+
+<!-- PLAYER DE VÍDEO DE CARD -->
+<div id="card-video-overlay" onclick="closeCardVideoOutside(event)">
+  <div class="card-video-wrap">
+    <div class="card-video-player-box">
+      <button class="card-video-close" onclick="closeCardVideo()">&#x2715;</button>
+      <video id="card-video-player" controls playsinline preload="metadata"
+        style="width:100%;height:100%;object-fit:contain;background:#000;outline:none">
+        Seu navegador não suporta vídeo HTML5.
+      </video>
+    </div>
+    <div class="card-video-info">
+      <div id="card-video-title"></div>
+      <div id="card-video-desc"></div>
+    </div>
+  </div>
+</div>
 
 <!-- PÁGINA ROTEIRO DA VIAGEM -->
 <div id="roteiro-overlay">
